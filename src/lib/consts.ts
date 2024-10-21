@@ -1,0 +1,1 @@
+export const GoogleCustomSearchUrl = "https://www.googleapis.com/customsearch/v1"
