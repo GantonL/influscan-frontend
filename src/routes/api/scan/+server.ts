@@ -8,18 +8,20 @@ export const POST: RequestHandler = async (event) => {
   if (!scanData) {return error(500)};
   const scanCandidates: {Name: string, Email: string, Address: string}[] = JSON.parse(scanData.toString());
   const results: unknown[] = [];
-  for await (const scanCandidate of scanCandidates.slice(0, 2)) {
-    const searchResults = await fetch(`${GoogleCustomSearchUrl}?q="${scanCandidate.Name}" AND "${scanCandidate.Email}" AND "${scanCandidate.Address}"&cx=${GOOGLE_CUSTOM_SEARCH_ENGINE}&key=${GOOGLE_CUSTOM_SEARCH_API_KEY}&limit=3`)
+  for await (const scanCandidate of scanCandidates) {
+    const searchResults = await fetch(`${GoogleCustomSearchUrl}?q="${scanCandidate.Name}" AND ("${scanCandidate.Email}" OR "${scanCandidate.Address}")&cx=${GOOGLE_CUSTOM_SEARCH_ENGINE}&key=${GOOGLE_CUSTOM_SEARCH_API_KEY}&limit=5`)
     const fromSearch = await searchResults.json();
-    console.log(fromSearch?.searchInformation)
     if (Number(fromSearch?.searchInformation?.totalResults ?? 0) > 0) {
-      results.push(...(fromSearch.items as Record<string, string>[]).map(item => { 
-        return {
-          title: item.title,
-          snippet: item.snippet,
-          link: item.link,
-        }}
-      ));
+      results.push({
+        name: scanCandidate.Name,
+        results: (fromSearch.items as Record<string, string>[]).map(item => { 
+          return {
+            title: item.title,
+            snippet: item.snippet,
+            link: item.link,
+          }}
+        ) 
+      });
     }
   }
   return json({results});

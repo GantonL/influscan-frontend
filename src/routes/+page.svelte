@@ -3,7 +3,8 @@
 
   let form: {results: unknown[]} = { results: [] };
   let scanResults: unknown[] = [];
-
+  let analysisResults: unknown;
+  
   page.subscribe((pageRes) => {
     form.results = pageRes?.form?.results ?? [];
   });
@@ -18,8 +19,20 @@
         })
       })
   }
+
+  function analyze() {
+    const body = new FormData();
+    body.append('details', JSON.stringify(scanResults[2].name));
+    body.append('results', JSON.stringify(scanResults[2].results));
+    fetch('./api/analyze', {method: 'POST', body})
+      .then((res) => {
+        res.json().then((res) => {
+          analysisResults = res.result;
+        })
+      })
+  }
 </script>
-<div class="flex items-center justify-center h-[75vh]">
+<div class="flex items-center justify-center h-[100vh] overflow-auto">
   <div class="flex flex-col items-center gap-2">
     <h1 class="text-4xl font-bold">InfluScan</h1>
     <p class="text-lg">Identify your customers influencial footprint</p>
@@ -35,9 +48,17 @@
     {#if form.results.length > 0}
       <button on:click={scan}>Scan</button>
     {/if}
-    <div class="max-h-96 overflow-auto">
+    <div class="max-h-96 max-w-xl overflow-auto">
       {#if scanResults.length > 0}
-        <pre>{JSON.stringify(scanResults, null, 2)}</pre>
+        <pre class="text-wrap">{JSON.stringify(scanResults, null, 2)}</pre>
+      {/if}
+    </div>
+    {#if scanResults.length > 0}
+      <button on:click={analyze}>Analyze</button>
+    {/if}
+    <div class="max-h-96 max-w-xl overflow-auto">
+      {#if analysisResults}
+        <pre class="text-wrap">{JSON.stringify(analysisResults, null, 2)}</pre>
       {/if}
     </div>
   </div>
