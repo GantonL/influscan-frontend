@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { page } from "$app/stores";
 
-  let form: {results: unknown[]} = { results: [] };
-  let scanResults: unknown[] = [];
-  let analysisResults: unknown;
+  let form: {results: unknown[]} = $state({ results: [] });
+  let scanResults: unknown[] = $state([]);
+  let analysisResults: unknown = $state();
   
   page.subscribe((pageRes) => {
     form.results = pageRes?.form?.results ?? [];
@@ -22,8 +22,8 @@
 
   function analyze() {
     const body = new FormData();
-    body.append('details', JSON.stringify(scanResults[2].name));
-    body.append('results', JSON.stringify(scanResults[2].results));
+    body.append('details', JSON.stringify(scanResults[1].name));
+    body.append('results', JSON.stringify(scanResults[1].results));
     fetch('./api/analyze', {method: 'POST', body})
       .then((res) => {
         res.json().then((res) => {
@@ -46,7 +46,7 @@
       {/if}
     </div>
     {#if form.results.length > 0}
-      <button on:click={scan}>Scan</button>
+      <button onclick={scan}>Scan</button>
     {/if}
     <div class="max-h-96 max-w-xl overflow-auto">
       {#if scanResults.length > 0}
@@ -54,7 +54,7 @@
       {/if}
     </div>
     {#if scanResults.length > 0}
-      <button on:click={analyze}>Analyze</button>
+      <button onclick={analyze}>Analyze</button>
     {/if}
     <div class="max-h-96 max-w-xl overflow-auto">
       {#if analysisResults}
