@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from "$app/stores";
+  import { Button } from "$lib/components/ui/button/index.js";
 
   let form: {results: unknown[]} = $state({ results: [] });
   let scanResults: unknown[] = $state([]);
@@ -38,7 +39,7 @@
     <p class="text-lg">Identify your customers influencial footprint</p>
     <form method="POST" enctype="multipart/form-data">
       <input type="file" name="file" accept="text/csv" />
-      <button>Submit</button>
+      <Button variant="secondary">Submit</Button>
     </form>
     <div class="max-h-96 overflow-auto">
       {#if form.results.length > 0}
