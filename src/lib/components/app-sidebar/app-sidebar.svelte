@@ -1,30 +1,25 @@
 <script lang="ts">
-  import House from "lucide-svelte/icons/house";
   import Settings from "lucide-svelte/icons/settings";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import Radar from "lucide-svelte/icons/radar";
 	import CircleHelp from "lucide-svelte/icons/circle-help";
 	import Send from "lucide-svelte/icons/send";
-	import { Collapsible } from "bits-ui";
+	import { page } from "$app/stores";
   
   const groups = [
     {
       label: "Application",
       items: [
         {
-          title: "Home",
-          url: "#",
-          icon: House,
-        },
-        {
           title: "Scans",
-          url: "#",
+          url: "/scans",
           icon: Radar,
         },
         {
           title: "Settings",
-          url: "#",
+          url: "/settings",
           icon: Settings,
+          disabled: true,
         },
       ]
     },
@@ -34,17 +29,20 @@
       items: [
         {
           title: "Support",
-          url: "#",
-          icon: CircleHelp,
+          url: "/support",
+          icon: CircleHelp,     
+          disabled: true,
         },
         {
           title: "Feedback",
-          url: "#",
+          url: "/feedback",
           icon: Send,
+          disabled: true,
         },
       ]
     }
   ];
+  let currentPath = $derived($page.url.pathname);
  </script>
   
  <Sidebar.Root collapsible="icon">
@@ -58,14 +56,15 @@
         <Sidebar.Menu>
         {#each group.items as item (item.title)}
           <Sidebar.MenuItem>
-          <Sidebar.MenuButton>
-            {#snippet child({ props })}
-            <a href={item.url} {...props}>
-              <item.icon />
-              <span>{item.title}</span>
-            </a>
-            {/snippet}
-          </Sidebar.MenuButton>
+            <Sidebar.MenuButton 
+              isActive={currentPath.startsWith(item.url)}>
+              {#snippet child({ props })}
+              <a href={item.url} {...props}>
+                <item.icon />
+                <span>{item.title}</span>
+              </a>
+              {/snippet}
+            </Sidebar.MenuButton>
           </Sidebar.MenuItem>
         {/each}
         </Sidebar.Menu>
