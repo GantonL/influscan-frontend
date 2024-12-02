@@ -1,0 +1,48 @@
+<script lang="ts">
+  import Ellipsis from "lucide-svelte/icons/ellipsis";
+  import { Button } from "$lib/components/ui/button";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+	import type { MenuConfiguration } from "$lib/models/menu";
+  
+  let { rawData, configuration, event }: { rawData: any, configuration: MenuConfiguration, event: (e: {type: string; data: any}) => void } = $props();
+  
+</script>
+
+  
+<DropdownMenu.Root>
+<DropdownMenu.Trigger>
+  {#snippet child({ props })}
+  <Button
+    {...props}
+    variant="ghost"
+    size="icon"
+    class="relative size-8 p-0"
+  >
+    <span class="sr-only">Open menu</span>
+    {#if configuration.trigger} 
+      <configuration.trigger class={configuration.triggerClass} />
+    {:else}
+      <Ellipsis class="size-4 rotate-90"/>
+    {/if}
+  </Button>
+  {/snippet}
+</DropdownMenu.Trigger>
+  <DropdownMenu.Content>
+    {#each configuration.groups as group, index}
+      <DropdownMenu.Group>
+        {#if group.header}
+        <DropdownMenu.GroupHeading>{group.header}</DropdownMenu.GroupHeading>
+        {/if}
+        {#each group.items as item}
+        <DropdownMenu.Item 
+          onclick={() => event({type: item.event, data: rawData})}>
+          <span class={item.class}>{item.title}</span>
+        </DropdownMenu.Item>
+        {/each}
+      </DropdownMenu.Group>
+      {#if index < configuration.groups.length - 1}
+      <DropdownMenu.Separator />
+      {/if}
+    {/each}
+  </DropdownMenu.Content>
+</DropdownMenu.Root>
