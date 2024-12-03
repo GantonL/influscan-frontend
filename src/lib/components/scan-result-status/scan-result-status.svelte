@@ -16,8 +16,8 @@
   const configuration: Record<ScanStatus, StatusConfiguration> = {
     'completed': {icon: CircleCheckBig, class: 'text-green-500', tooltip: 'Completed'},
     'failed': {icon: CircelX, class: 'text-destructive', tooltip: 'Failed'},
-    'in_progress': {icon: CircelDashed, class: 'text-yellow-500', tooltip: 'In progress'},
-    'not_started': {icon: ClockAlert, class: 'text-muted', tooltip: 'Not started'}
+    'in_progress': {icon: CircelDashed, class: 'text-yellow-500 animate-spin', tooltip: 'In progress'},
+    'not_started': {icon: ClockAlert, class: 'text-muted-foreground', tooltip: 'Not started'}
   }
 </script>
 {#snippet selectedStatus(statusConfiguration: StatusConfiguration)}
