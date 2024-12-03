@@ -8,3 +8,8 @@ export interface EmptyResultsConfiguration {
   },
   class?: string;
 }
+
+export interface AppCustomEvent<Data = void> {
+  type: string;
+  data?: Data;
+}

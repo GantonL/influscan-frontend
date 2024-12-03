@@ -35,8 +35,14 @@
         {/if}
         {#each group.items as item}
         <DropdownMenu.Item 
+          class={item.class}
           onclick={() => event({type: item.event, data: rawData})}>
-          <span class={item.class}>{item.title}</span>
+          <div class="flex flex-row gap-2 items-center">
+            {#if item.icon}
+              <item.icon size=16/>
+            {/if}
+            {item.title}
+          </div>
         </DropdownMenu.Item>
         {/each}
       </DropdownMenu.Group>

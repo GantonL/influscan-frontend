@@ -1,6 +1,7 @@
 export interface MenuActionItem {
   title: string;
   event: string;
+  icon: ConstructorOfATypedSvelteComponent;
   class?: string;
 }
 

@@ -1,4 +1,3 @@
-import Menu from "$lib/components/menu/menu.svelte";
 import ScanResultStatus from "$lib/components/scan-result-status/scan-result-status.svelte";
 import { renderComponent, renderSnippet } from "$lib/components/ui/data-table";
 import type { EmptyResultsConfiguration } from "$lib/models/common";
@@ -6,9 +5,10 @@ import type { MenuConfiguration } from "$lib/models/menu";
 import type { ScanResult } from "$lib/models/scan";
 import type { ColumnDef } from "@tanstack/table-core";
 import { createRawSnippet } from "svelte";
-import { writable } from "svelte/store";
-
-export const scanActionsMenuEvents = writable();
+import ScanTableActions from "./scan-table-actions.svelte";
+import Copy from "lucide-svelte/icons/copy";
+import Trash2 from "lucide-svelte/icons/trash-2";
+import Radar from "lucide-svelte/icons/radar";
 
 export const emptyResultsConfiguration: EmptyResultsConfiguration = {
   label: 'No scans found',
@@ -51,21 +51,34 @@ export const columns: ColumnDef<ScanResult>[] = [
     id: "actions",
     header: "Actions",
     cell: ({row}) => {
-      return renderComponent(Menu, { rawData: row.original, configuration: actionsMenu, event: scanActionsMenuEvents.set  }) 
+      return renderComponent(ScanTableActions, {data: row.original}) 
     }
   }
 ];
 
-const actionsMenu: MenuConfiguration = {
+export const actionsMenu: MenuConfiguration = {
   groups: [
     {
       items: [
-        {title: 'Copy scan ID', event: 'copy'}
+        {
+          title: 'Rescan', 
+          event: 'scan', 
+          icon: Radar
+        },
+        {
+          title: 'Copy scan ID', 
+          event: 'copy', 
+          icon: Copy
+        }
       ]
     },
     {
       items: [
-        {title: 'Delete', event: 'delete'}
+        {
+          title: 'Delete', 
+          event: 'delete', 
+          icon: Trash2, 
+          class: 'bg-destructive/5 text-destructive'}
       ]
     }
   ]

@@ -22,7 +22,7 @@
 		context: TContext;
 	};
 
-	let { content, context }: Props = $props();
+	let { content, context, ...restProps }: Props = $props();
 </script>
 
 {#if typeof content === "string"}
@@ -33,7 +33,7 @@
 	{@const result = content(context as any)}
 	{#if result instanceof RenderComponentConfig}
 		{@const { component: Component, props } = result}
-		<Component {...props} />
+		<Component {...props} {restProps} />
 	{:else if result instanceof RenderSnippetConfig}
 		{@const { snippet, params } = result}
 		{@render snippet(params)}
