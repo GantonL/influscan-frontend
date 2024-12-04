@@ -6,23 +6,12 @@ import type { ScanResult } from '$lib/models/scan';
 export const load: PageServerLoad = async () => {
   const scansResults: ScanResult[] = [
     {
-      id: '1',
-      date: Date.now(),
-      status: 'completed',
-      details: {
-        first_name: 'Guy',
-        last_name: 'Lahav',
-      },
-      estimation: 70,
-      explanation: 'Because',
-    },
-    {
       id: '2',
       date: Date.now(),
       status: 'failed',
       details: {
-        first_name: 'Guy',
-        last_name: 'Lahav',
+        first_name: 'Customer',
+        last_name: '2',
       },
     },
     {
@@ -30,8 +19,8 @@ export const load: PageServerLoad = async () => {
       date: Date.now(),
       status: 'in_progress',
       details: {
-        first_name: 'Guy',
-        last_name: 'Lahav',
+        first_name: 'Customer',
+        last_name: '3',
       },
     },
     {
@@ -39,10 +28,65 @@ export const load: PageServerLoad = async () => {
       date: Date.now(),
       status: 'not_started',
       details: {
-        first_name: 'Guy',
-        last_name: 'Lahav',
+        first_name: 'Customer',
+        last_name: '4',
       },
-    }
+    },
+    {
+      id: '5',
+      date: Date.now(),
+      status: 'completed',
+      details: {
+        first_name: 'Customer',
+        last_name: '5',
+      },
+      estimation: 20,
+      explanation: 'Because',
+    },
+    {
+      id: '6',
+      date: Date.now(),
+      status: 'completed',
+      details: {
+        first_name: 'Customer',
+        last_name: '6',
+      },
+      estimation: 40,
+      explanation: 'Because',
+    },
+    {
+      id: '7',
+      date: Date.now(),
+      status: 'completed',
+      details: {
+        first_name: 'Customer',
+        last_name: '7',
+      },
+      estimation: 60,
+      explanation: 'Because',
+    },
+    {
+      id: '8',
+      date: Date.now(),
+      status: 'completed',
+      details: {
+        first_name: 'Customer',
+        last_name: '8',
+      },
+      estimation: 80,
+      explanation: 'Because',
+    },
+    {
+      id: '9',
+      date: Date.now(),
+      status: 'completed',
+      details: {
+        first_name: 'Customer',
+        last_name: '9',
+      },
+      estimation: 95,
+      explanation: 'Because',
+    },
   ]; 
   return {
     scansResults,

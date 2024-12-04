@@ -9,6 +9,7 @@ import ScanTableActions from "./scan-table-actions.svelte";
 import Copy from "lucide-svelte/icons/copy";
 import Trash2 from "lucide-svelte/icons/trash-2";
 import Radar from "lucide-svelte/icons/radar";
+import ScanResultEstimation from "$lib/components/scan-result-estimation/scan-result-estimation.svelte";
 
 export const emptyResultsConfiguration: EmptyResultsConfiguration = {
   label: 'No scans found',
@@ -42,6 +43,11 @@ export const columns: ColumnDef<ScanResult>[] = [
   {
     accessorKey: 'estimation',
     header: 'Estimation',
+    cell: ({row}) => {
+      const estimation = row.original.estimation;
+      if (!estimation) return;
+      return renderComponent(ScanResultEstimation, { estimation });
+    }
   },
   {
     accessorKey: 'explanation',
