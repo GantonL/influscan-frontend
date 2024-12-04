@@ -36,6 +36,7 @@
         {#each group.items as item}
         <DropdownMenu.Item 
           class={item.class}
+          disabled={item.disableIf && item.disableIf(rawData)}
           onclick={() => event({type: item.event, data: rawData})}>
           <div class="flex flex-row gap-2 items-center">
             {#if item.icon}

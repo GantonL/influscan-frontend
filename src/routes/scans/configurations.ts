@@ -62,14 +62,14 @@ export const columns: ColumnDef<ScanResult>[] = [
   }
 ];
 
-export const actionsMenu: MenuConfiguration = {
+export const actionsMenu: MenuConfiguration<ScanResult> = {
   groups: [
     {
       items: [
         {
           title: 'Rescan', 
           event: 'scan', 
-          icon: Radar
+          icon: Radar,
         },
         {
           title: 'Copy scan ID', 
