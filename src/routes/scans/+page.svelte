@@ -7,12 +7,12 @@
 
   const scans: ScanResult[] = $state($page.data.scansResults ?? []);
 
-  function onAddScan(event: string) {
+  function onAddScan() {
     
   }
 </script>
 {#if scans.length === 0}
 <EmptyResults configuration={emptyResultsConfiguration} action={onAddScan}/>
 {:else}
-<AppTable { columns } data={scans} />
+<AppTable { columns } data={scans} addData={onAddScan}/>
 {/if}

@@ -87,6 +87,39 @@ export const load: PageServerLoad = async () => {
       estimation: 95,
       explanation: 'Because',
     },
+    {
+      id: '10',
+      date: Date.now(),
+      status: 'completed',
+      details: {
+        first_name: 'Customer',
+        last_name: '10',
+      },
+      estimation: 34,
+      explanation: 'Because',
+    },
+    {
+      id: '11',
+      date: Date.now(),
+      status: 'completed',
+      details: {
+        first_name: 'Customer',
+        last_name: '11',
+      },
+      estimation: 12,
+      explanation: 'Because',
+    },
+    {
+      id: '12',
+      date: Date.now(),
+      status: 'completed',
+      details: {
+        first_name: 'Customer',
+        last_name: '12',
+      },
+      estimation: 1,
+      explanation: 'Because',
+    },
   ]; 
   return {
     scansResults,
@@ -94,7 +127,7 @@ export const load: PageServerLoad = async () => {
 }
 
 export const actions = {
-  default: async ({ request }) => {
+  dataFromFile: async ({ request }) => {
     const form = await request.formData();
     const file = form.get('file') as File | null;
 
@@ -104,6 +137,11 @@ export const actions = {
     const text = await file.text();
     const results = parse(text, {header: true});
 
+    return { results };
+  },
+  dataFromInput: async ({request}) => {
+    const form = await request.formData();
+    const results = [];
     return { results };
   }
 } satisfies Actions;
