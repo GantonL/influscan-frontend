@@ -10,6 +10,7 @@ import Copy from "lucide-svelte/icons/copy";
 import Trash2 from "lucide-svelte/icons/trash-2";
 import Radar from "lucide-svelte/icons/radar";
 import ScanResultEstimation from "$lib/components/scan-result-estimation/scan-result-estimation.svelte";
+import Checkbox from "$lib/components/checkbox/checkbox.svelte";
 
 export const emptyResultsConfiguration: EmptyResultsConfiguration = {
   label: 'No scans found',
@@ -20,6 +21,28 @@ export const emptyResultsConfiguration: EmptyResultsConfiguration = {
 }
 
 export const columns: ColumnDef<ScanResult>[] = [
+  {
+    id: "select",
+    header: ({ table }) =>
+      renderComponent(Checkbox, {
+        checked: table.getIsAllPageRowsSelected(),
+        indeterminate:
+          table.getIsSomePageRowsSelected() &&
+          !table.getIsAllPageRowsSelected(),
+        onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
+        controlledChecked: true,
+        "aria-label": "Select all",
+      }),
+    cell: ({ row }) =>
+      renderComponent(Checkbox, {
+        checked: row.getIsSelected(),
+        onCheckedChange: (value) => row.toggleSelected(!!value),
+        controlledChecked: true,
+        "aria-label": "Select row",
+      }),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: 'status',
     header: 'Status',

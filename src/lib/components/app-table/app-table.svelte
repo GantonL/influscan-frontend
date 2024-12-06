@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData, TValue">
-  import { type ColumnDef, getCoreRowModel, getPaginationRowModel, type PaginationState, type VisibilityState } from "@tanstack/table-core";
+  import { type ColumnDef, getCoreRowModel, getPaginationRowModel, type PaginationState, type RowSelectionState, type VisibilityState } from "@tanstack/table-core";
   import {
    createSvelteTable,
    FlexRender,
@@ -7,7 +7,9 @@
   import * as Table from "$lib/components/ui/table/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
-	import ChevronDown from "lucide-svelte/icons/chevron-down";
+	import Settings2 from "lucide-svelte/icons/settings-2";
+	import ChevronLeft from "lucide-svelte/icons/chevron-left";
+	import ChevronRight from "lucide-svelte/icons/chevron-right";
 	import { Plus } from "lucide-svelte";
 
   type DataTableProps<TData, TValue> = {
@@ -19,6 +21,7 @@
 
   let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
   let columnVisibility = $state<VisibilityState>({});
+  let rowSelection = $state<RowSelectionState>({});
   
   const table = createSvelteTable({
     get data() {
@@ -39,12 +42,22 @@
         pagination = updater;
       }
     },
+    onRowSelectionChange: (updater) => {
+      if (typeof updater === "function") {
+        rowSelection = updater(rowSelection);
+      } else {
+        rowSelection = updater;
+      }
+    },
     state: {
       get pagination() {
         return pagination;
       },
       get columnVisibility() {
         return columnVisibility;
+      },
+      get rowSelection() {
+        return rowSelection;
       },
     },
     getCoreRowModel: getCoreRowModel(),
@@ -53,41 +66,7 @@
  </script>
   
  <div class="flex flex-col gap-2">
-    <div class="flex flex-row gap-2 justify-between">
-      <DropdownMenu.Root>
-        <DropdownMenu.Trigger>
-          {#snippet child({ props })}
-            <Button {...props} variant="outline" class="flex flex-row gap-2 items-center">
-              <span>Columns</span>
-              <ChevronDown />
-            </Button>
-          {/snippet}
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content align="end">
-          {#each table
-            .getAllColumns()
-            .filter((col) => col.getCanHide()) as column (column.id)}
-            <DropdownMenu.CheckboxItem
-              class="capitalize"
-              controlledChecked
-              checked={column.getIsVisible()}
-              onCheckedChange={(value) => column.toggleVisibility(!!value)}
-            >
-              {column.id}
-            </DropdownMenu.CheckboxItem>
-          {/each}
-        </DropdownMenu.Content>
-      </DropdownMenu.Root>
-      <Button
-        variant="outline"
-        onclick={() => addData()}
-      >
-        <div class="flex flex-row gap-2 items-center">
-          <Plus />
-          <span>Add</span>
-        </div>
-      </Button>
-    </div>
+   {@render header()}
    <div class="rounded-md border">
     <Table.Root>
      <Table.Header>
@@ -128,23 +107,70 @@
      </Table.Body>
     </Table.Root>
    </div>
-   <div class="flex items-center justify-end">
-    <Button
-      variant="outline"
-      size="sm"
-      onclick={() => table.previousPage()}
-      disabled={!table.getCanPreviousPage()}
-    >
-      Previous
-    </Button>
-    <Button
-      variant="outline"
-      size="sm"
-      onclick={() => table.nextPage()}
-      disabled={!table.getCanNextPage()}
-    >
-      Next
-    </Button>
-   </div>
+   {@render footer()}
  </div>
- 
+
+ {#snippet header()}
+  <div class="flex flex-row gap-2 justify-between">
+    <Button
+      variant="outline"
+      onclick={() => addData()}
+    >
+      <div class="flex flex-row gap-2 items-center">
+        <Plus />
+        <span>Add</span>
+      </div>
+    </Button>
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger>
+        {#snippet child({ props })}
+          <Button {...props} variant="outline" class="flex flex-row gap-2 items-center">
+            <Settings2 />
+            <span>View</span>
+          </Button>
+        {/snippet}
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content align="end">
+        {#each table
+          .getAllColumns()
+          .filter((col) => col.getCanHide()) as column (column.id)}
+          <DropdownMenu.CheckboxItem
+            class="capitalize"
+            controlledChecked
+            checked={column.getIsVisible()}
+            onCheckedChange={(value) => column.toggleVisibility(!!value)}
+          >
+            {column.id}
+          </DropdownMenu.CheckboxItem>
+        {/each}
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
+  </div>
+ {/snippet}
+
+ {#snippet footer()}
+  <div class="flex flex-row gap-2 justify-between">
+    <div class="text-muted-foreground flex-1 text-sm">
+      {table.getFilteredSelectedRowModel().rows.length} of{" "}
+      {table.getFilteredRowModel().rows.length} row(s) selected.
+    </div>
+    <div class="flex items-center justify-end">
+      <Button
+        variant="outline"
+        size="sm"
+        onclick={() => table.previousPage()}
+        disabled={!table.getCanPreviousPage()}
+      >
+        <ChevronLeft />
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onclick={() => table.nextPage()}
+        disabled={!table.getCanNextPage()}
+      >
+        <ChevronRight />
+      </Button>
+    </div>
+  </div>
+ {/snippet}

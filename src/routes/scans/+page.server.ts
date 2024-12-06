@@ -6,6 +6,39 @@ import type { ScanResult } from '$lib/models/scan';
 export const load: PageServerLoad = async () => {
   const scansResults: ScanResult[] = [
     {
+      id: '9',
+      date: Date.now(),
+      status: 'completed',
+      details: {
+        first_name: 'Customer',
+        last_name: '9',
+      },
+      estimation: 95,
+      explanation: 'Because',
+    },
+    {
+      id: '10',
+      date: Date.now(),
+      status: 'completed',
+      details: {
+        first_name: 'Customer',
+        last_name: '10',
+      },
+      estimation: 34,
+      explanation: 'Because',
+    },
+    {
+      id: '11',
+      date: Date.now(),
+      status: 'completed',
+      details: {
+        first_name: 'Customer',
+        last_name: '11',
+      },
+      estimation: 12,
+      explanation: 'Because',
+    },
+    {
       id: '2',
       date: Date.now(),
       status: 'failed',
@@ -74,40 +107,7 @@ export const load: PageServerLoad = async () => {
         last_name: '8',
       },
       estimation: 80,
-      explanation: 'Because',
-    },
-    {
-      id: '9',
-      date: Date.now(),
-      status: 'completed',
-      details: {
-        first_name: 'Customer',
-        last_name: '9',
-      },
-      estimation: 95,
-      explanation: 'Because',
-    },
-    {
-      id: '10',
-      date: Date.now(),
-      status: 'completed',
-      details: {
-        first_name: 'Customer',
-        last_name: '10',
-      },
-      estimation: 34,
-      explanation: 'Because',
-    },
-    {
-      id: '11',
-      date: Date.now(),
-      status: 'completed',
-      details: {
-        first_name: 'Customer',
-        last_name: '11',
-      },
-      estimation: 12,
-      explanation: 'Because',
+      explanation: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut molestiae quia quis temporibus voluptas eaque libero obcaecati dolore debitis necessitatibus omnis delectus perspiciatis, minima optio voluptate, suscipit dolorum maiores. Ut.',
     },
     {
       id: '12',
@@ -127,18 +127,6 @@ export const load: PageServerLoad = async () => {
 }
 
 export const actions = {
-  dataFromFile: async ({ request }) => {
-    const form = await request.formData();
-    const file = form.get('file') as File | null;
-
-    if (!file) {
-      return error(400, 'No file provided');
-    }
-    const text = await file.text();
-    const results = parse(text, {header: true});
-
-    return { results };
-  },
   dataFromInput: async ({request}) => {
     const form = await request.formData();
     const results = [];
