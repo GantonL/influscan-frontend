@@ -9,6 +9,7 @@
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
 	import { LoaderCircle } from "lucide-svelte";
+	import { analyze, buildScanResultObjectFromParsedRawData, search } from "./utilities";
 
   let scans: ScanResult[] = $state($page.data.scansResults ?? []);
 	let addScanDialogOpened = $state(false);
@@ -23,22 +24,24 @@
 		submitMutipleInprogress = true;
 		const body = new FormData();
 		body.append('file', files[0]);
-		fetch('/api/file-handler', {method: 'POST', body})
+		fetch('/api/file-handler/parse-csv', {method: 'POST', body})
 			.then((res) => {
-				res.json().then((parsedData: Record<string, string>[]) => {
-					scans = parsedData.map(d => {
-						const nameArray = d.Name.split(' ');
-						const first_name = nameArray[0];
-						const last_name = nameArray.length > 1 ? nameArray[1] : '';
-						return {
-							id: `${Math.random()}`,
-							date: Date.now(),
-							status: 'in_progress',
-							details: {
-								first_name,
-								last_name,
-							},
-						}
+				res.json().then((parsedData: {Name: string, Email: string, Address: string}[]) => {
+					scans = parsedData.map((d) => buildScanResultObjectFromParsedRawData(d));
+					scans.forEach((scanRes, index) => {
+						// scan(scanRes.id, parsedData[index]);
+						// {
+						//   estimation: 70,
+						//   explanation: 'Maya Narkis has a visible Instagram presence with a substantial follower count of over 150,000, indicating a significant influencer footprint.'
+						// }
+						// {
+						//   estimation: 80,
+						//   explanation: 'Niv Sultan has a significant social media presence with 430K Instagram followers and recognition from international figures like Glenn Close, indicating a substantial influential footprint.'
+						// }
+						// {
+						//   estimation: 30,
+						//   explanation: 'Efrat Vachtel has a modest online presence, primarily on TikTok and Instagram, with a small following and some engagement on her podcast, indicating a niche or emerging influencer status.'
+						// }
 					})
 				})
 			})
@@ -48,6 +51,28 @@
 				setScanDialogOpenState(false);
 			})
 	}
+
+	async function scan(id: string, rawData: {Name: string, Email: string, Address: string}) {
+		const searchResults = await search(rawData);
+		let analysisDetails = rawData.Name;
+		if (rawData.Email) {
+			analysisDetails.concat(`, ${rawData.Email}`);
+		}
+		if (rawData.Address) {
+			analysisDetails.concat(`, ${rawData.Address}`);
+		}
+		const analysisResult = await analyze(analysisDetails , searchResults);
+		const scanToUpdate = scans.find((scan) => scan.id === id);
+		if (!scanToUpdate) {
+			// error
+			return;
+		}
+		scanToUpdate.estimation = analysisResult.estimation; 
+		scanToUpdate.explanation = analysisResult.explanation;
+		scanToUpdate.status = 'completed';
+		scans = scans;
+	}
+
 </script>
 {#if scans.length === 0}
 <EmptyResults configuration={emptyResultsConfiguration} action={() => setScanDialogOpenState(true)}/>

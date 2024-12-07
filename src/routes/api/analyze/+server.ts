@@ -14,7 +14,7 @@ export const POST: RequestHandler = async (event) => {
 
   const analysisResult = z.object({
     estimation: z.number(),
-    reason: z.string(),
+    explanation: z.string(),
   });
 
   const completion = await openai.beta.chat.completions.parse({
@@ -27,5 +27,5 @@ export const POST: RequestHandler = async (event) => {
   });
 
   const result = completion.choices[0].message.parsed;
-  return json({result});
+  return json(result);
 }

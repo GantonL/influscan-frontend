@@ -1,10 +1,23 @@
-import { error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import parse from "csv-simple-parser";
 import type { ScanResult } from '$lib/models/scan';
 
 export const load: PageServerLoad = async () => {
-  const scansResults: ScanResult[] = [
+  const scansResults: ScanResult[] = []; 
+  return {
+    scansResults,
+  }
+}
+
+export const actions = {
+  dataFromInput: async ({request}) => {
+    const form = await request.formData();
+    const results = [];
+    return { results };
+  }
+} satisfies Actions;
+
+const demoData = (): ScanResult[] => {
+  return [
     {
       id: '9',
       date: Date.now(),
@@ -121,15 +134,4 @@ export const load: PageServerLoad = async () => {
       explanation: 'Because',
     },
   ]; 
-  return {
-    scansResults,
-  }
 }
-
-export const actions = {
-  dataFromInput: async ({request}) => {
-    const form = await request.formData();
-    const results = [];
-    return { results };
-  }
-} satisfies Actions;
