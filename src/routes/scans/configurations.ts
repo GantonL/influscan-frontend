@@ -11,6 +11,7 @@ import Trash2 from "lucide-svelte/icons/trash-2";
 import Radar from "lucide-svelte/icons/radar";
 import ScanResultEstimation from "$lib/components/scan-result-estimation/scan-result-estimation.svelte";
 import Checkbox from "$lib/components/checkbox/checkbox.svelte";
+import ScanResultExplanation from "$lib/components/scan-result-explanaiton/scan-result-explanation.svelte";
 
 export const emptyResultsConfiguration: EmptyResultsConfiguration = {
   label: 'No scans found',
@@ -75,6 +76,11 @@ export const columns: ColumnDef<ScanResult>[] = [
   {
     accessorKey: 'explanation',
     header: 'Explanation',
+    cell: ({row}) => {
+      const explanation = row.original.explanation;
+      if (!explanation) return;
+      return renderComponent(ScanResultExplanation, { explanation });
+    }
   },
   {
     id: "actions",

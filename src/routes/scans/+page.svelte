@@ -29,19 +29,7 @@
 				res.json().then((parsedData: {Name: string, Email: string, Address: string}[]) => {
 					scans = parsedData.map((d) => buildScanResultObjectFromParsedRawData(d));
 					scans.forEach((scanRes, index) => {
-						// scan(scanRes.id, parsedData[index]);
-						// {
-						//   estimation: 70,
-						//   explanation: 'Maya Narkis has a visible Instagram presence with a substantial follower count of over 150,000, indicating a significant influencer footprint.'
-						// }
-						// {
-						//   estimation: 80,
-						//   explanation: 'Niv Sultan has a significant social media presence with 430K Instagram followers and recognition from international figures like Glenn Close, indicating a substantial influential footprint.'
-						// }
-						// {
-						//   estimation: 30,
-						//   explanation: 'Efrat Vachtel has a modest online presence, primarily on TikTok and Instagram, with a small following and some engagement on her podcast, indicating a niche or emerging influencer status.'
-						// }
+						scan(scanRes.id, parsedData[index]);
 					})
 				})
 			})
@@ -70,15 +58,10 @@
 		scanToUpdate.estimation = analysisResult.estimation; 
 		scanToUpdate.explanation = analysisResult.explanation;
 		scanToUpdate.status = 'completed';
-		scans = scans;
 	}
 
 </script>
-{#if scans.length === 0}
-<EmptyResults configuration={emptyResultsConfiguration} action={() => setScanDialogOpenState(true)}/>
-{:else}
 <AppTable { columns } data={scans} addData={() => setScanDialogOpenState(true)}/>
-{/if}
 
 <Dialog.Root open={addScanDialogOpened} controlledOpen={true} onOpenChange={setScanDialogOpenState}>
   <Dialog.Content>

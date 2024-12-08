@@ -11,6 +11,7 @@
 	import ChevronLeft from "lucide-svelte/icons/chevron-left";
 	import ChevronRight from "lucide-svelte/icons/chevron-right";
 	import { Plus } from "lucide-svelte";
+	import EmptyResults from "../empty-results/empty-results.svelte";
 
   type DataTableProps<TData, TValue> = {
    columns: ColumnDef<TData, TValue>[];
@@ -65,7 +66,7 @@
   });
  </script>
   
- <div class="flex flex-col gap-2">
+ <div class="flex flex-col gap-2 w-full max-w-[1200px]">
    {@render header()}
    <div class="rounded-md border">
     <Table.Root>
@@ -100,7 +101,7 @@
       {:else}
        <Table.Row>
         <Table.Cell colspan={columns.length} class="h-24 text-center">
-         No results.
+          <EmptyResults />
         </Table.Cell>
        </Table.Row>
       {/each}
