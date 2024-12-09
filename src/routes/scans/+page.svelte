@@ -2,7 +2,7 @@
 	import { page } from "$app/stores";
 	import AppTable from "$lib/components/app-table/app-table.svelte";
 	import type { ScanResult } from "$lib/models/scan";
-	import { columns } from "./configurations";
+	import { columns, tableConfiguration } from "./configurations";
 	import * as Dialog from "$lib/components/ui/dialog/index.js";
 	import { Button } from "$lib/components/ui/button";
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
@@ -60,8 +60,12 @@
 		scanToUpdate.status = 'completed';
 	}
 
+	function onBulkActions(e: {type: string; data: any}) {
+		console.log(e)
+	}
+
 </script>
-<AppTable { columns } data={scans} addData={() => setScanDialogOpenState(true)}/>
+<AppTable { columns } data={scans} configuration={tableConfiguration} addData={() => setScanDialogOpenState(true)} bulkActions={onBulkActions}/>
 
 <Dialog.Root open={addScanDialogOpened} controlledOpen={true} onOpenChange={setScanDialogOpenState}>
   <Dialog.Content>

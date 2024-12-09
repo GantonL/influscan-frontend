@@ -1,6 +1,5 @@
 import ScanResultStatus from "$lib/components/scan-result-status/scan-result-status.svelte";
 import { renderComponent, renderSnippet } from "$lib/components/ui/data-table";
-import type { EmptyResultsConfiguration } from "$lib/models/common";
 import type { MenuConfiguration } from "$lib/models/menu";
 import type { ScanResult } from "$lib/models/scan";
 import type { ColumnDef } from "@tanstack/table-core";
@@ -9,17 +8,12 @@ import ScanTableActions from "./scan-table-actions.svelte";
 import Copy from "lucide-svelte/icons/copy";
 import Trash2 from "lucide-svelte/icons/trash-2";
 import Radar from "lucide-svelte/icons/radar";
+import Eye from "lucide-svelte/icons/eye";
+import TableOfContents from "lucide-svelte/icons/table-of-contents";
 import ScanResultEstimation from "$lib/components/scan-result-estimation/scan-result-estimation.svelte";
 import Checkbox from "$lib/components/checkbox/checkbox.svelte";
 import ScanResultExplanation from "$lib/components/scan-result-explanaiton/scan-result-explanation.svelte";
-
-export const emptyResultsConfiguration: EmptyResultsConfiguration = {
-  label: 'No scans found',
-  action: {
-    event: 'add',
-    label: 'Add'
-  }
-}
+import type { TableConfiguration } from "$lib/models/table";
 
 export const columns: ColumnDef<ScanResult>[] = [
   {
@@ -96,6 +90,11 @@ export const actionsMenu: MenuConfiguration<ScanResult> = {
     {
       items: [
         {
+          title: 'View details', 
+          event: 'view', 
+          icon: Eye,
+        },
+        {
           title: 'Rescan', 
           event: 'scan', 
           icon: Radar,
@@ -104,7 +103,7 @@ export const actionsMenu: MenuConfiguration<ScanResult> = {
           title: 'Copy scan ID', 
           event: 'copy', 
           icon: Copy
-        }
+        },
       ]
     },
     {
@@ -117,4 +116,32 @@ export const actionsMenu: MenuConfiguration<ScanResult> = {
       ]
     }
   ]
-}
+};
+
+export const tableConfiguration: TableConfiguration<ScanResult> = {
+  bulkActions: {
+    label: 'Actions',
+    buttonVariant: 'default',
+    trigger: TableOfContents,
+    groups: [
+      {
+        items: [
+          {
+            title: 'Rescan', 
+            event: 'scan', 
+            icon: Radar,
+          },
+        ]
+      },
+      {
+        items: [
+          {
+            title: 'Delete', 
+            event: 'delete', 
+            icon: Trash2, 
+            class: 'bg-destructive/5 text-destructive'}
+        ]
+      }
+    ]
+  },
+};

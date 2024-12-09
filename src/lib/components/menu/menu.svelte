@@ -14,15 +14,18 @@
   {#snippet child({ props })}
   <Button
     {...props}
-    variant="ghost"
-    size="icon"
-    class="relative size-8 p-0"
+    variant={configuration.buttonVariant ?? "ghost"}
+    size={configuration.label ? "default" : "icon"}
+    class="flex flex-row gap-2 item-center relative"
   >
     <span class="sr-only">Open menu</span>
     {#if configuration.trigger} 
       <configuration.trigger class={configuration.triggerClass} />
     {:else}
       <Ellipsis class="size-4 rotate-90"/>
+    {/if}
+    {#if configuration.label}
+      <span>{configuration.label}</span>
     {/if}
   </Button>
   {/snippet}

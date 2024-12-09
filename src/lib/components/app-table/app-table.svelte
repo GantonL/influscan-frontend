@@ -12,13 +12,16 @@
 	import ChevronRight from "lucide-svelte/icons/chevron-right";
 	import { Plus } from "lucide-svelte";
 	import EmptyResults from "../empty-results/empty-results.svelte";
+	import { type TableConfiguration } from "$lib/models/table";
+	import Menu from "../menu/menu.svelte";
 
   type DataTableProps<TData, TValue> = {
    columns: ColumnDef<TData, TValue>[];
    data: TData[];
+   configuration?: TableConfiguration<TData>;
   };
   
-  let { data, columns, addData }: DataTableProps<TData, TValue> & { addData: () => void } = $props();
+  let { data, columns, configuration, addData, bulkActions }: DataTableProps<TData, TValue> & { addData: () => void, bulkActions?: (e: {type: string; data: any}) => void } = $props();
 
   let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
   let columnVisibility = $state<VisibilityState>({});
@@ -64,6 +67,10 @@
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+  function onBulkMenu(e: {type: string; data: any}) {
+    bulkActions && bulkActions(e);
+  }
  </script>
   
  <div class="flex flex-col gap-2 w-full max-w-[1200px]">
@@ -113,15 +120,20 @@
 
  {#snippet header()}
   <div class="flex flex-row gap-2 justify-between">
-    <Button
-      variant="outline"
-      onclick={() => addData()}
-    >
-      <div class="flex flex-row gap-2 items-center">
-        <Plus />
-        <span>Add</span>
-      </div>
-    </Button>
+    <div class="flex flex-row gap-2 items-center">
+      <Button
+        variant="outline"
+        onclick={() => addData()}
+      >
+        <div class="flex flex-row gap-2 items-center">
+          <Plus />
+          <span>Add</span>
+        </div>
+      </Button>
+      {#if configuration?.bulkActions && (table.getIsSomePageRowsSelected() || table.getIsAllPageRowsSelected() || table.getIsAllRowsSelected())}
+        <Menu rawData={table.getFilteredSelectedRowModel().rows.map(r => r.original)} configuration={configuration.bulkActions} event={onBulkMenu}/>
+      {/if}
+    </div>
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
         {#snippet child({ props })}
