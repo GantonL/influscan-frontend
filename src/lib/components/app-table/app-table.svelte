@@ -14,6 +14,7 @@
 	import EmptyResults from "../empty-results/empty-results.svelte";
 	import { type TableConfiguration } from "$lib/models/table";
 	import Menu from "../menu/menu.svelte";
+	import { preventDefault, stopPropagation } from "svelte/legacy";
 
   type DataTableProps<TData, TValue> = {
    columns: ColumnDef<TData, TValue>[];
@@ -21,7 +22,7 @@
    configuration?: TableConfiguration<TData>;
   };
   
-  let { data, columns, configuration, addData, bulkActions }: DataTableProps<TData, TValue> & { addData: () => void, bulkActions?: (e: {type: string; data: any}) => void } = $props();
+  let { data, columns, configuration, addData, bulkActions, rowClick }: DataTableProps<TData, TValue> & { addData: () => void, bulkActions?: (e: {type: string; data: any}) => void, rowClick?: (e: {type: string; data: any}) => void } = $props();
 
   let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
   let columnVisibility = $state<VisibilityState>({});
@@ -72,6 +73,13 @@
   function onBulkMenu(e: {type: string; data: any}) {
     bulkActions && bulkActions(e);
   }
+
+  function onRowClick(columnId: string, data: any) {
+    if (!configuration?.onRowClick) { return; }
+    if (configuration.onRowClick.ignoreColumns?.includes(columnId)) { return; }
+    rowClick && 
+    rowClick({type: configuration.onRowClick.event, data})
+  }
  </script>
   
  <div class="flex flex-col gap-2 w-full max-w-[1200px]">
@@ -98,7 +106,8 @@
       {#each table.getRowModel().rows as row (row.id)}
        <Table.Row data-state={row.getIsSelected() && "selected"}>
         {#each row.getVisibleCells() as cell (cell.id)}
-         <Table.Cell>
+         <Table.Cell
+          onclick={() => onRowClick(cell.column.id, $state.snapshot(row.original))} >
           <FlexRender
            content={cell.column.columnDef.cell}
            context={cell.getContext()}

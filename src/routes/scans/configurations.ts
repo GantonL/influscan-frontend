@@ -1,14 +1,10 @@
 import ScanResultStatus from "$lib/components/scan-result-status/scan-result-status.svelte";
 import { renderComponent, renderSnippet } from "$lib/components/ui/data-table";
-import type { MenuConfiguration } from "$lib/models/menu";
 import type { ScanResult } from "$lib/models/scan";
 import type { ColumnDef } from "@tanstack/table-core";
 import { createRawSnippet } from "svelte";
-import ScanTableActions from "./scan-table-actions.svelte";
-import Copy from "lucide-svelte/icons/copy";
 import Trash2 from "lucide-svelte/icons/trash-2";
 import Radar from "lucide-svelte/icons/radar";
-import Eye from "lucide-svelte/icons/eye";
 import TableOfContents from "lucide-svelte/icons/table-of-contents";
 import ScanResultEstimation from "$lib/components/scan-result-estimation/scan-result-estimation.svelte";
 import Checkbox from "$lib/components/checkbox/checkbox.svelte";
@@ -76,47 +72,7 @@ export const columns: ColumnDef<ScanResult>[] = [
       return renderComponent(ScanResultExplanation, { explanation });
     }
   },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: ({row}) => {
-      return renderComponent(ScanTableActions, {data: row.original}) 
-    }
-  }
 ];
-
-export const actionsMenu: MenuConfiguration<ScanResult> = {
-  groups: [
-    {
-      items: [
-        {
-          title: 'View details', 
-          event: 'view', 
-          icon: Eye,
-        },
-        {
-          title: 'Rescan', 
-          event: 'scan', 
-          icon: Radar,
-        },
-        {
-          title: 'Copy scan ID', 
-          event: 'copy', 
-          icon: Copy
-        },
-      ]
-    },
-    {
-      items: [
-        {
-          title: 'Delete', 
-          event: 'delete', 
-          icon: Trash2, 
-          class: 'bg-destructive/5 text-destructive'}
-      ]
-    }
-  ]
-};
 
 export const tableConfiguration: TableConfiguration<ScanResult> = {
   bulkActions: {
@@ -144,6 +100,10 @@ export const tableConfiguration: TableConfiguration<ScanResult> = {
       }
     ]
   },
+  onRowClick: {
+    event: 'navigate',
+    ignoreColumns: ['select']
+  }
 };
 
 import { z } from "zod";

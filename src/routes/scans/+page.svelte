@@ -13,6 +13,7 @@
 	import { superForm } from "sveltekit-superforms";
 	import { zodClient } from "sveltekit-superforms/adapters";
 	import { Input } from "$lib/components/ui/input";
+	import { goto } from "$app/navigation";
 
   let scans = $state<ScanResult[]>($page.data.scansResults ?? []);
 	let addScanDialogOpened = $state(false);
@@ -98,8 +99,18 @@
 		}
 	}
 
+	function onRowClick(e: {type: string; data: any}) {
+		if (e.type === 'navigate') {
+			goto(`scans/${e.data.id}`);
+		}
+	}
+
 </script>
-<AppTable { columns } data={scans} configuration={tableConfiguration} addData={() => setScanDialogOpenState(true)} bulkActions={onBulkActions}/>
+<AppTable { columns } data={scans} 
+	configuration={tableConfiguration} 
+	addData={() => setScanDialogOpenState(true)} 
+	bulkActions={onBulkActions}
+	rowClick={onRowClick}/>
 
 <Dialog.Root open={addScanDialogOpened} controlledOpen={true} onOpenChange={setScanDialogOpenState}>
   <Dialog.Content>
