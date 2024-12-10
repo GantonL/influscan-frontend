@@ -145,3 +145,13 @@ export const tableConfiguration: TableConfiguration<ScanResult> = {
     ]
   },
 };
+
+import { z } from "zod";
+ 
+export const singleScanformSchema = z.object({
+  name: z.string().min(3).max(50).trim(),
+  email: z.string().email().optional(),
+  address: z.string().optional(),
+});
+ 
+export type SingleScanFormSchema = typeof singleScanformSchema;

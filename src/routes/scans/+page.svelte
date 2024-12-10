@@ -2,18 +2,41 @@
 	import { page } from "$app/stores";
 	import AppTable from "$lib/components/app-table/app-table.svelte";
 	import type { ScanResult } from "$lib/models/scan";
-	import { columns, tableConfiguration } from "./configurations";
+	import { columns, singleScanformSchema, tableConfiguration } from "./configurations";
 	import * as Dialog from "$lib/components/ui/dialog/index.js";
 	import { Button } from "$lib/components/ui/button";
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
 	import { HelpCircle, LoaderCircle } from "lucide-svelte";
 	import { analyze, buildScanResultObjectFromParsedRawData, search } from "./utilities";
+	import * as Form from "$lib/components/ui/form";
+	import { superForm } from "sveltekit-superforms";
+	import { zodClient } from "sveltekit-superforms/adapters";
+	import { Input } from "$lib/components/ui/input";
 
-  let scans: ScanResult[] = $state($page.data.scansResults ?? []);
+  let scans = $state<ScanResult[]>($page.data.scansResults ?? []);
 	let addScanDialogOpened = $state(false);
-	let submitMutipleInprogress = $state(false);
+	let submitInprogress = $state(false);
 	let fileStructureInstructionsDialogOpened = $state(false);
+
+	const singleScanForm = superForm({name: '', email: '', address: ''}, {
+		validators: zodClient(singleScanformSchema),
+		onSubmit: () => submitInprogress = true,
+		onUpdated: ({form}) => {
+			submitInprogress = false;
+			if (form.valid) {
+				setScanDialogOpenState(false);
+				const newScan = buildScanResultObjectFromParsedRawData(form.data);
+				scans = [newScan, ...scans];
+				scan(newScan, form.data);
+			}
+		},
+		onError: () => {
+			submitInprogress = false;
+		},
+ 	});
+
+ 	const { form: singleScanFormData, enhance: singleScanFormEnhance } = singleScanForm;
 
   function setScanDialogOpenState(state: boolean) {
 		addScanDialogOpened = state;
@@ -21,36 +44,38 @@
 	let files: FileList | undefined = $state();
 	function onMultipleDetailsSubmit() {
 		if (!files) { return; }
-		submitMutipleInprogress = true;
+		submitInprogress = true;
 		const body = new FormData();
 		body.append('file', files[0]);
 		fetch('/api/file-handler/parse-csv', {method: 'POST', body})
 			.then((res) => {
-				res.json().then((parsedData: {Name: string, Email: string, Address: string}[]) => {
-					scans = parsedData.map((d) => buildScanResultObjectFromParsedRawData(d));
-					scans.forEach((scanRes, index) => {
-						scan(scanRes.id, parsedData[index]);
+				res.json().then((parsedData: {name: string, email: string, address: string}[]) => {
+					const newScans = parsedData.map((d) => buildScanResultObjectFromParsedRawData(d));
+					scans = [...newScans, ...scans];
+					newScans.forEach((scanRes, index) => {
+						scan(scanRes, parsedData[index]);
 					})
 				})
 			})
 			.finally(() => {
 				files = undefined;
-				submitMutipleInprogress = false;
+				submitInprogress = false;
 				setScanDialogOpenState(false);
 			})
 	}
 
-	async function scan(id: string, rawData: {Name: string, Email: string, Address: string}) {
+	async function scan(preScan: ScanResult, rawData: {name: string, email: string, address: string}) {
+		preScan.status = 'in_progress';
 		const searchResults = await search(rawData);
-		let analysisDetails = rawData.Name;
-		if (rawData.Email) {
-			analysisDetails.concat(`, ${rawData.Email}`);
+		let analysisDetails = rawData.name;
+		if (rawData.email) {
+			analysisDetails.concat(`, ${rawData.email}`);
 		}
-		if (rawData.Address) {
-			analysisDetails.concat(`, ${rawData.Address}`);
+		if (rawData.address) {
+			analysisDetails.concat(`, ${rawData.address}`);
 		}
 		const analysisResult = await analyze(analysisDetails , searchResults);
-		const scanToUpdate = scans.find((scan) => scan.id === id);
+		const scanToUpdate = scans.find((scan) => scan.id === preScan.id);
 		if (!scanToUpdate) {
 			// error
 			return;
@@ -61,7 +86,16 @@
 	}
 
 	function onBulkActions(e: {type: string; data: any}) {
-		console.log(e)
+		if (e?.type === 'delete') {
+			e.data.forEach((item: ScanResult) => {
+				const scanToDeleteIndex = scans.findIndex((scan) => scan.id === item.id);
+				if (scanToDeleteIndex > -1) {
+					scans.splice(scanToDeleteIndex, 1);
+					scans = [...scans];
+				}
+			})
+			// Delete from db
+		}
 	}
 
 </script>
@@ -91,9 +125,9 @@
 							<HelpCircle size=12/>
 						</Button>
 						<Button onclick={onMultipleDetailsSubmit}
-							disabled={!files || submitMutipleInprogress}>
+							disabled={!files || submitInprogress}>
 							<div class="flex flex-row gap-2 items-center">
-								{#if submitMutipleInprogress}
+								{#if submitInprogress}
 									<LoaderCircle class="animate-spin"/>
 								{/if}
 								<span>Submit</span>
@@ -101,7 +135,46 @@
 						</Button>
 					</div>
 				</Tabs.Content>
-				<Tabs.Content value="single"></Tabs.Content>
+				<Tabs.Content value="single">
+					<form method="POST" action="?/dataFromInput" use:singleScanFormEnhance>
+						<Form.Field form={singleScanForm} name="name">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Form.Label>Name</Form.Label>
+									<Input {...props} bind:value={$singleScanFormData.name} />
+								{/snippet}
+							</Form.Control>
+							<Form.FieldErrors />
+						</Form.Field>
+						<Form.Field form={singleScanForm} name="email">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Form.Label>Email</Form.Label>
+									<Input {...props} bind:value={$singleScanFormData.email} />
+								{/snippet}
+							</Form.Control>
+							<Form.FieldErrors />
+						</Form.Field>
+						<Form.Field form={singleScanForm} name="address">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Form.Label>Address</Form.Label>
+									<Input {...props} bind:value={$singleScanFormData.address} />
+								{/snippet}
+							</Form.Control>
+							<Form.FieldErrors />
+						</Form.Field>
+						<Form.Button
+							disabled={submitInprogress}>
+							<div class="flex flex-row gap-2 items-center">
+								{#if submitInprogress}
+									<LoaderCircle class="animate-spin"/>
+								{/if}
+								<span>Submit</span>
+							</div>
+						</Form.Button>
+					</form>
+				</Tabs.Content>
 			</div>
 		</Tabs.Root>
   </Dialog.Content>
@@ -123,7 +196,7 @@
 			</ul>
 			<h4 class="text-lg">File content example</h4>
 			<article class="italic rounded-md p-1 bg-accent text-wrap">
-				Name,Email,Address<br>
+				name,email,address<br>
 				David Cohen,david.cohen@example.com,123 Herzl St, Tel Aviv, Israel<br>
 				Yael Levy,yael.levy@example.com,456 Ben Yehuda St, Haifa, Israel<br>
 				Avi Shapiro,avi.shapiro@example.com,789 Rothschild Blvd, Jerusalem, Israel<br>

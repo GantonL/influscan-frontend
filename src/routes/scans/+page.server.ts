@@ -1,5 +1,8 @@
 import type { Actions, PageServerLoad } from './$types';
 import type { ScanResult } from '$lib/models/scan';
+import { fail, superValidate } from 'sveltekit-superforms';
+import { singleScanformSchema } from './configurations';
+import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async () => {
   const scansResults: ScanResult[] = mockData(); 
@@ -9,10 +12,17 @@ export const load: PageServerLoad = async () => {
 }
 
 export const actions = {
-  dataFromInput: async ({request}) => {
-    const form = await request.formData();
-    const results = [];
-    return { results };
+  dataFromInput: async (event) => {
+    const form = await superValidate(event, zod(singleScanformSchema));
+    if (!form.valid) {
+      return fail(400, {
+        form,
+      });
+    }
+    // Insert to db
+    return {
+      form,
+    };
   }
 } satisfies Actions;
 

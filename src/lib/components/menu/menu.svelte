@@ -40,7 +40,7 @@
         <DropdownMenu.Item 
           class={item.class}
           disabled={item.disableIf && item.disableIf(rawData)}
-          onclick={() => event({type: item.event, data: rawData})}>
+          onclick={() => event({type: item.event, data: $state.snapshot(rawData)})}>
           <div class="flex flex-row gap-2 items-center">
             {#if item.icon}
               <item.icon size=16/>

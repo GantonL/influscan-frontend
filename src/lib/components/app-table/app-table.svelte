@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData, TValue">
-  import { type ColumnDef, getCoreRowModel, getPaginationRowModel, type PaginationState, type RowSelectionState, type VisibilityState } from "@tanstack/table-core";
+  import { type ColumnDef, getCoreRowModel, getPaginationRowModel, type PaginationState, type RowSelectionState, type TableOptions, type VisibilityState } from "@tanstack/table-core";
   import {
    createSvelteTable,
    FlexRender,
@@ -27,7 +27,7 @@
   let columnVisibility = $state<VisibilityState>({});
   let rowSelection = $state<RowSelectionState>({});
   
-  const table = createSvelteTable({
+  const tableOptions: TableOptions<any> = ({
     get data() {
       return data;
     },
@@ -66,7 +66,8 @@
     },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-  });
+  })
+  const table = createSvelteTable(tableOptions);
 
   function onBulkMenu(e: {type: string; data: any}) {
     bulkActions && bulkActions(e);

@@ -1,13 +1,13 @@
 import type { ScanResult } from "$lib/models/scan";
 
 export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, string>): ScanResult => {
-  const nameArray = rawData.Name?.split(' ');
+  const nameArray = rawData.name?.split(' ');
   const first_name = nameArray[0];
   const last_name = nameArray.length > 1 ? nameArray[1] : '';
   return {
     id: `${crypto.randomUUID()}`,
     date: Date.now(),
-    status: 'in_progress',
+    status: 'not_started',
     details: {
       first_name,
       last_name,
@@ -15,7 +15,7 @@ export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, s
   }
 }
 
-export const search = async (candidateData: {Name: string, Email: string, Address: string}): Promise<{ title: string; snippet: string; link: string}[]> => {
+export const search = async (candidateData: {name: string, email: string, address: string}): Promise<{ title: string; snippet: string; link: string}[]> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('data', JSON.stringify(candidateData));
