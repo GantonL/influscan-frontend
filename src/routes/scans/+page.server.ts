@@ -5,7 +5,9 @@ import { singleScanformSchema } from './configurations';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  // locals.session.userId = to fetch data.
+  if (!locals?.session?.userId) {
+    return;
+  }
   const scansResults: ScanResult[] = mockData(); 
   return {
     scansResults,
