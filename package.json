@@ -41,7 +41,9 @@
   },
   "type": "module",
   "dependencies": {
+    "@clerk/backend": "^1.21.0",
     "@tanstack/table-core": "^8.20.5",
+    "clerk-sveltekit": "^0.4.2",
     "csv-simple-parser": "^1.0.3",
     "mode-watcher": "^0.5.0",
     "openai": "^4.68.1",
