@@ -8,6 +8,6 @@ export const handle: Handle = sequence(
 		debug: true,
 		protectedPaths: ['/scans'],
 		signInUrl: '/sign-in',
-		authorizedParties: ['http://localhost:5173'],
+		authorizedParties: ['http://localhost:5173', 'influscan.pages.dev'],
 	})
 )
