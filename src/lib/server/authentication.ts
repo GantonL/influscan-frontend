@@ -1,5 +1,6 @@
 import type { Handle, RequestEvent } from '@sveltejs/kit';
 import { verifyToken } from '@clerk/backend';
+import type { User } from '$lib/models/user';
 
 type ClerkErrorWithReason = {
 	reason?: string
@@ -36,7 +37,7 @@ export default function handleClerk(
         console.log('[Clerk SvelteKit] Found session token in cookies.');
       }
 			try {
-				const session = await verifySession(secretKey, sessionToken, {authorizedParties})
+				const session = await verifySession(secretKey, sessionToken, {authorizedParties});
 				if (session) {
           if (debug) {
             console.log('[Clerk SvelteKit] Session verified successfully.');
@@ -79,15 +80,16 @@ export default function handleClerk(
 	}) satisfies Handle
 }
 
-const verifySession = async (secretKey: string, sessionToken: string, {authorizedParties = []}: {authorizedParties?: string[]}) => {
+const verifySession = async (secretKey: string, sessionToken: string, {authorizedParties = []}: {authorizedParties?: string[]}): Promise<User | undefined> => {
 	if (sessionToken) {
 		const claims = await verifyToken(sessionToken, {
 			secretKey,
 			authorizedParties,
 		})
 		return {
-			userId: claims.sub,
-			claims,
+			id: claims.user_id as string,
+			name: claims.user_name as string,
 		}
 	}
+	return;
 }

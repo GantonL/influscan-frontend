@@ -3,12 +3,13 @@ import type { ScanResult } from '$lib/models/scan';
 import { fail, superValidate } from 'sveltekit-superforms';
 import { singleScanformSchema } from './configurations';
 import { zod } from 'sveltekit-superforms/adapters';
+import { getScans } from '$lib/server/database/scans';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  if (!locals?.session?.userId) {
+  if (!locals?.session?.id) {
     return;
   }
-  const scansResults: ScanResult[] = mockData(); 
+  const scansResults: ScanResult[] = await getScans(); 
   return {
     scansResults,
   }
@@ -33,7 +34,7 @@ const mockData = (): ScanResult[] => {
   return [
     {
       id: '9',
-      date: Date.now(),
+      created_at: Date.now(),
       status: 'completed',
       details: {
         first_name: 'Customer',
@@ -44,7 +45,7 @@ const mockData = (): ScanResult[] => {
     },
     {
       id: '10',
-      date: Date.now(),
+      created_at: Date.now(),
       status: 'completed',
       details: {
         first_name: 'Customer',
@@ -55,7 +56,7 @@ const mockData = (): ScanResult[] => {
     },
     {
       id: '11',
-      date: Date.now(),
+      created_at: Date.now(),
       status: 'completed',
       details: {
         first_name: 'Customer',
