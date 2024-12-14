@@ -23,6 +23,7 @@ export default function handleClerk(
 		protectedPaths?: ProtectedPath[];
 		signInUrl?: string;
     authorizedParties?: string[];
+		jwtKey?: string
 	}
 ) {
 	return (async ({ event, resolve }) => {
@@ -37,7 +38,7 @@ export default function handleClerk(
         console.log('[Clerk SvelteKit] Found session token in cookies.');
       }
 			try {
-				const session = await verifySession(secretKey, sessionToken, {authorizedParties});
+				const session = await verifySession(sessionToken, {secretKey, authorizedParties});
 				if (session) {
           if (debug) {
             console.log('[Clerk SvelteKit] Session verified successfully.');
@@ -80,11 +81,12 @@ export default function handleClerk(
 	}) satisfies Handle
 }
 
-const verifySession = async (secretKey: string, sessionToken: string, {authorizedParties = []}: {authorizedParties?: string[]}): Promise<User | undefined> => {
+const verifySession = async (sessionToken: string, {secretKey, jwtKey, authorizedParties = []}: {secretKey: string; jwtKey?: string; authorizedParties?: string[]}): Promise<User | undefined> => {
 	if (sessionToken) {
 		const claims = await verifyToken(sessionToken, {
 			secretKey,
 			authorizedParties,
+			jwtKey,
 		})
 		return {
 			id: claims.user_id as string,

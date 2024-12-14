@@ -48,7 +48,7 @@ export const columns: ColumnDef<ScanResult>[] = [
       const detailsCellSnippet = createRawSnippet((getDetails: () => ScanResult['details']) => {
         const details = getDetails();
         return {
-          render: () => `<div>${details.first_name} ${details.last_name}</div>`
+          render: () => `<div>${details.name}</div>`
         }
       });
       return renderSnippet(detailsCellSnippet, row.getValue('details'));

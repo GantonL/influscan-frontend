@@ -69,12 +69,6 @@
 		preScan.status = 'in_progress';
 		const searchResults = await search(rawData);
 		let analysisDetails = rawData.name;
-		if (rawData.email) {
-			analysisDetails.concat(`, ${rawData.email}`);
-		}
-		if (rawData.address) {
-			analysisDetails.concat(`, ${rawData.address}`);
-		}
 		const analysisResult = await analyze(analysisDetails , searchResults);
 		const scanToUpdate = scans.find((scan) => scan.id === preScan.id);
 		if (!scanToUpdate) {

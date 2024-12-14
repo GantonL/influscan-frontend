@@ -1,16 +1,15 @@
 import type { ScanResult } from "$lib/models/scan";
 
 export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, string>): ScanResult => {
-  const nameArray = rawData.name?.split(' ');
-  const first_name = nameArray[0];
-  const last_name = nameArray.length > 1 ? nameArray[1] : '';
   return {
     id: `${crypto.randomUUID()}`,
-    date: Date.now(),
+    created_at: Date.now(),
     status: 'not_started',
     details: {
-      first_name,
-      last_name,
+      name: rawData.name,
+      email: rawData.email,
+      address: rawData.address,
+      country: rawData.country,
     },
   }
 }
