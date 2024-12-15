@@ -14,7 +14,7 @@ export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, s
   }
 }
 
-export const search = async (candidateData: {name: string, email: string, address: string}): Promise<{ title: string; snippet: string; link: string}[]> => {
+export const search = async (candidateData: {name: string, email: string, address: string}): Promise<{ title: string; snippet: string; link: string}[] & { error?: Record<string, string> }> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('data', JSON.stringify(candidateData));
