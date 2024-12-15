@@ -68,9 +68,13 @@
 	async function scan(preScan: ScanResult, rawData: {name: string, email: string, address: string}) {
 		preScan.status = 'in_progress';
 		const searchResults = await search(rawData);
+		const scanToUpdate = scans.find((scan) => scan.id === preScan.id);
+		if (searchResults.error) {
+			scanToUpdate.status = 'failed';
+			return;
+		}
 		let analysisDetails = rawData.name;
 		const analysisResult = await analyze(analysisDetails , searchResults);
-		const scanToUpdate = scans.find((scan) => scan.id === preScan.id);
 		if (!scanToUpdate) {
 			// error
 			return;

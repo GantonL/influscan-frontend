@@ -10,6 +10,10 @@ export const POST: RequestHandler = async (event) => {
   const results: unknown[] = [];
   const searchResults = await fetch(`${GoogleCustomSearchUrl}?q="${scanCandidate.name}" AND ("${scanCandidate.email}" OR "${scanCandidate.address}")&cx=${GOOGLE_CUSTOM_SEARCH_ENGINE}&key=${GOOGLE_CUSTOM_SEARCH_API_KEY}&limit=5`)
   const fromSearch = await searchResults.json();
+  if (fromSearch.error) {
+    console.error('[Search failed]', fromSearch.error.message);
+    return json(fromSearch);
+  }
   if (Number(fromSearch?.searchInformation?.totalResults ?? 0) > 0) {
     results.push({
       name: scanCandidate.name,
