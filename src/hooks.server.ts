@@ -6,7 +6,7 @@ import handleClerk from '$lib/server/authentication';
 export const handle: Handle = sequence(
 	handleClerk(CLERK_SECRET_KEY, {
 		debug: true,
-		protectedPaths: ['/scans'],
+		protectedPaths: ['/scans', '/api'],
 		signInUrl: '/sign-in',
 		authorizedParties: ['http://localhost:5173', 'https://influscan.pages.dev'],
 	})

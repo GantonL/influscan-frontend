@@ -21,7 +21,7 @@
     <Tooltip.Trigger>
       {@render estimationScale(estimation)}
     </Tooltip.Trigger>
-    <Tooltip.Content>{estimation}</Tooltip.Content>
+    <Tooltip.Content>{estimation}%</Tooltip.Content>
   </Tooltip.Root>
 </Tooltip.Provider>
 {#snippet estimationScale(est: typeof estimation)}
