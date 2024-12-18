@@ -8,7 +8,7 @@
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
 	import { HelpCircle, LoaderCircle } from "lucide-svelte";
-	import { analyze, buildScanResultObjectFromParsedRawData, createScanObject, search, updateScanObject } from "./utilities";
+	import { analyze, buildScanResultObjectFromParsedRawData, createScanObject, deleteScanObject, search, updateScanObject } from "./utilities";
 	import * as Form from "$lib/components/ui/form";
 	import { superForm } from "sveltekit-superforms";
 	import { zodClient } from "sveltekit-superforms/adapters";
@@ -97,14 +97,15 @@
 	function onBulkActions(e: {type: string; data: any}) {
 		switch (e?.type) {
 			case 'delete':
-				e.data.forEach((item: ScanResult) => {
-					const scanToDeleteIndex = scans.findIndex((scan) => scan.id === item.id);
+				const idsToDelete = e.data.map((item: ScanResult) => item.id);
+				idsToDelete.forEach((id: ScanResult['id']) => {
+					const scanToDeleteIndex = scans.findIndex((scan) => scan.id === id);
 					if (scanToDeleteIndex > -1) {
 						scans.splice(scanToDeleteIndex, 1);
 						scans = [...scans];
 					}
 				})
-				// Delete from db
+				deleteScanObject(idsToDelete);
 				break;
 			case 'scan':
 				console.log(e.data)

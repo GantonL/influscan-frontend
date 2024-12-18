@@ -43,6 +43,20 @@ export const updateScanObject = async (id: ScanResult['id'], updateObject: Parti
   });
 }
 
+export const deleteScanObject = async (ids: ScanResult['id'][]): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    const body = new FormData();
+    body.append('ids', JSON.stringify(ids));
+    fetch('/api/scans', {method: 'DELETE', body})
+      .then((res) => {
+        res.json()
+          .then((res) => {
+            resolve(!!res);
+          }, reject);
+      }, reject);
+  });
+}
+
 export const search = async (candidateData: ScanResult['details']): Promise<{ title: string; snippet: string; link: string}[] & { error?: Record<string, string> }> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();

@@ -45,11 +45,11 @@ export const updateScan = async (user_id: string, id: ScanResult['id'], updateOb
   return true
 };
 
-export const deleteScan = async (user_id: string, id: string): Promise<boolean> => {
+export const deleteScans = async (user_id: string, ids: string[]): Promise<boolean> => {
   const { error } = await db.from(Tables.Scans)
     .delete()
     .eq('user_id', user_id)
-    .eq('id', id);
+    .in('id', ids);
   if (error) {
     console.error('[deleteScan]', error);
     return false;
