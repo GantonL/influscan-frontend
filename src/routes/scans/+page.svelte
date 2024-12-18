@@ -8,7 +8,7 @@
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
 	import { HelpCircle, LoaderCircle } from "lucide-svelte";
-	import { analyze, buildScanResultObjectFromParsedRawData, createScanObject, search } from "./utilities";
+	import { analyze, buildScanResultObjectFromParsedRawData, createScanObject, search, updateScanObject } from "./utilities";
 	import * as Form from "$lib/components/ui/form";
 	import { superForm } from "sveltekit-superforms";
 	import { zodClient } from "sveltekit-superforms/adapters";
@@ -74,7 +74,7 @@
 			// error
 			return;
 		}
-		const createScanObjectRes = await createScanObject(preScan);
+		const createScanObjectRes = await createScanObject(scanToUpdate);
 		if (!createScanObjectRes) {
 			// error
 			return; 
@@ -82,7 +82,7 @@
 		const searchResults = await search(preScan.details);
 		if (searchResults.error) {
 			scanToUpdate.status = 'failed';
-			// update scan;
+			updateScanObject(scanToUpdate.id, {status: scanToUpdate.status}); 
 			return;
 		}
 		let analysisDetails = preScan.details.name;
@@ -91,7 +91,7 @@
 		scanToUpdate.estimation = analysisResult.estimation; 
 		scanToUpdate.explanation = analysisResult.explanation;
 		scanToUpdate.status = 'completed';
-		// update scan
+		updateScanObject(scanToUpdate.id, { status: scanToUpdate.status, estimation: scanToUpdate.estimation, explanation: scanToUpdate.explanation }); 
 	}
 
 	function onBulkActions(e: {type: string; data: any}) {

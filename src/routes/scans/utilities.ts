@@ -28,6 +28,21 @@ export const createScanObject = async (scan: Omit<ScanResult, 'user_id' | 'creat
   });
 }
 
+export const updateScanObject = async (id: ScanResult['id'], updateObject: Partial<Pick<ScanResult, 'details' | 'estimation' | 'explanation' | 'status'>>): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    const body = new FormData();
+    body.append('id', id);
+    body.append('updateObject', JSON.stringify(updateObject));
+    fetch('/api/scans', {method: 'PUT', body})
+      .then((res) => {
+        res.json()
+          .then((res) => {
+            resolve(!!res);
+          }, reject);
+      }, reject);
+  });
+}
+
 export const search = async (candidateData: ScanResult['details']): Promise<{ title: string; snippet: string; link: string}[] & { error?: Record<string, string> }> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
