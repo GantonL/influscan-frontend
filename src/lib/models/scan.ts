@@ -5,6 +5,7 @@ export interface ScanResult {
   created_at: number;
   status: ScanStatus;
   details: ScanResultDetails;
+  user_id: string;
   estimation?: number;
   explanation?: string;
 }

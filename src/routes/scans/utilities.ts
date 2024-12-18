@@ -1,9 +1,8 @@
 import type { ScanResult } from "$lib/models/scan";
 
-export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, string>): ScanResult => {
+export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, string>): Omit<ScanResult, 'user_id' | 'created_at'> => {
   return {
     id: `${crypto.randomUUID()}`,
-    created_at: Date.now(),
     status: 'not_started',
     details: {
       name: rawData.name,
@@ -14,7 +13,22 @@ export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, s
   }
 }
 
-export const search = async (candidateData: {name: string, email: string, address: string}): Promise<{ title: string; snippet: string; link: string}[] & { error?: Record<string, string> }> => {
+
+export const createScanObject = async (scan: Omit<ScanResult, 'user_id' | 'created_at'>): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    const body = new FormData();
+    body.append('data', JSON.stringify(scan));
+    fetch('/api/scans', {method: 'POST', body})
+      .then((res) => {
+        res.json()
+          .then((res) => {
+            resolve(!!res);
+          }, reject);
+      }, reject);
+  });
+}
+
+export const search = async (candidateData: ScanResult['details']): Promise<{ title: string; snippet: string; link: string}[] & { error?: Record<string, string> }> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('data', JSON.stringify(candidateData));

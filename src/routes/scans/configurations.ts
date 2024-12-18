@@ -11,7 +11,9 @@ import Checkbox from "$lib/components/checkbox/checkbox.svelte";
 import ScanResultExplanation from "$lib/components/scan-result-explanaiton/scan-result-explanation.svelte";
 import type { TableConfiguration } from "$lib/models/table";
 
-export const columns: ColumnDef<ScanResult>[] = [
+type TableScanResult = Pick<ScanResult, 'details' | 'id' | 'estimation' | 'explanation' | 'status'>;
+
+export const columns: ColumnDef<TableScanResult>[] = [
   {
     id: "select",
     header: ({ table }) =>
@@ -74,7 +76,7 @@ export const columns: ColumnDef<ScanResult>[] = [
   },
 ];
 
-export const tableConfiguration: TableConfiguration<ScanResult> = {
+export const tableConfiguration: TableConfiguration<TableScanResult> = {
   bulkActions: {
     label: 'Actions',
     buttonVariant: 'default',
