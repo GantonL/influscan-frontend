@@ -3,5 +3,5 @@
 </script>
 
 <div>
-	<SignIn redirectUrl="/scans" />
+	<SignIn redirectUrl="/sign-in/success" />
 </div>
