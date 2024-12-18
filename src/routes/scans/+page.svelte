@@ -8,14 +8,13 @@
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
 	import { HelpCircle, LoaderCircle } from "lucide-svelte";
-	import { analyze, buildScanResultObjectFromParsedRawData, createScanObject, deleteScanObject, search, updateScanObject } from "./utilities";
+	import { buildScanResultObjectFromParsedRawData, deleteScanObject, scan, type OmittedScanResult } from "./utilities";
 	import * as Form from "$lib/components/ui/form";
 	import { superForm } from "sveltekit-superforms";
 	import { zodClient } from "sveltekit-superforms/adapters";
 	import { Input } from "$lib/components/ui/input";
 	import { goto } from "$app/navigation";
 
-	type OmittedScanResult = Omit<ScanResult, 'user_id' | 'created_at'>; 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
 	let addScanDialogOpened = $state(false);
 	let submitInprogress = $state(false);
@@ -30,7 +29,7 @@
 				setScanDialogOpenState(false);
 				const newScan = buildScanResultObjectFromParsedRawData(form.data);
 				scans = [newScan, ...scans];
-				scan(newScan);
+				sendToScan(newScan);
 			}
 		},
 		onError: () => {
@@ -55,7 +54,7 @@
 					const newScans = parsedData.map((d) => buildScanResultObjectFromParsedRawData(d));
 					scans = [...newScans, ...scans];
 					newScans.forEach((scanRes) => {
-						scan(scanRes);
+						sendToScan(scanRes);
 					})
 				})
 			})
@@ -66,32 +65,28 @@
 			})
 	}
 
-	async function scan(preScan: OmittedScanResult) {
-		preScan.status = 'in_progress';
-		
+	async function sendToScan(preScan: OmittedScanResult) {		
 		const scanToUpdate = scans.find((scan) => scan.id === preScan.id);
 		if (!scanToUpdate) {
 			// error
 			return;
 		}
-		const createScanObjectRes = await createScanObject(scanToUpdate);
-		if (!createScanObjectRes) {
-			// error
-			return; 
-		}
-		const searchResults = await search(preScan.details);
-		if (searchResults.error) {
+		scanToUpdate.status = 'in_progress';
+		const scanResponse = await scan(scanToUpdate)
+		.catch(() => {
+			// handle errors
+			return {
+				success: false,
+				scanResult: scanToUpdate,
+			}
+		});
+		if (!scanResponse.success || !scanResponse.scanResult) {
 			scanToUpdate.status = 'failed';
-			updateScanObject(scanToUpdate.id, {status: scanToUpdate.status}); 
 			return;
 		}
-		let analysisDetails = preScan.details.name;
-		const analysisResult = await analyze(analysisDetails , searchResults);
-		
-		scanToUpdate.estimation = analysisResult.estimation; 
-		scanToUpdate.explanation = analysisResult.explanation;
-		scanToUpdate.status = 'completed';
-		updateScanObject(scanToUpdate.id, { status: scanToUpdate.status, estimation: scanToUpdate.estimation, explanation: scanToUpdate.explanation }); 
+		scanToUpdate.estimation = scanResponse.scanResult.estimation; 
+		scanToUpdate.explanation = scanResponse.scanResult.explanation;
+		scanToUpdate.status = scanResponse.scanResult.status;
 	}
 
 	function onBulkActions(e: {type: string; data: any}) {

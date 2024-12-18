@@ -1,1 +1,1 @@
-<h1>You are unaothorized!</h1>
+<h1>You are unauthorized!</h1>

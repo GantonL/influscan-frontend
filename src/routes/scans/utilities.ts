@@ -1,4 +1,7 @@
 import type { ScanResult } from "$lib/models/scan";
+import type { RequestEvent } from "./$types";
+
+export type OmittedScanResult = Omit<ScanResult, 'user_id' | 'created_at'>; 
 
 export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, string>): Omit<ScanResult, 'user_id' | 'created_at'> => {
   return {
@@ -13,12 +16,27 @@ export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, s
   }
 }
 
+export const scan = async (data: OmittedScanResult, options?: {fetch?: RequestEvent['fetch']}): Promise<{success: boolean, scanResult?: ScanResult}> => {
+  return new Promise((resolve, reject) => {
+    const body = new FormData();
+    body.append('data', JSON.stringify(data));
+    const request = options?.fetch ?? fetch;
+    request('/api/scan', {method: 'POST', body})
+      .then((res) => {
+        res.json()
+          .then((res) => {
+            resolve(res);
+          }, reject);
+      }, reject);
+  });
+}
 
-export const createScanObject = async (scan: Omit<ScanResult, 'user_id' | 'created_at'>): Promise<boolean> => {
+export const createScanObject = async (scan: Omit<ScanResult, 'user_id' | 'created_at'>, options?: {fetch?: RequestEvent['fetch']}): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('data', JSON.stringify(scan));
-    fetch('/api/scans', {method: 'POST', body})
+    const request = options?.fetch ?? fetch;
+    request('/api/results', {method: 'POST', body})
       .then((res) => {
         res.json()
           .then((res) => {
@@ -28,12 +46,13 @@ export const createScanObject = async (scan: Omit<ScanResult, 'user_id' | 'creat
   });
 }
 
-export const updateScanObject = async (id: ScanResult['id'], updateObject: Partial<Pick<ScanResult, 'details' | 'estimation' | 'explanation' | 'status'>>): Promise<boolean> => {
+export const updateScanObject = async (id: ScanResult['id'], updateObject: Partial<Pick<ScanResult, 'details' | 'estimation' | 'explanation' | 'status'>>, options?: {fetch?: RequestEvent['fetch']}): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('id', id);
     body.append('updateObject', JSON.stringify(updateObject));
-    fetch('/api/scans', {method: 'PUT', body})
+    const request = options?.fetch ?? fetch;
+    request('/api/results', {method: 'PUT', body})
       .then((res) => {
         res.json()
           .then((res) => {
@@ -43,11 +62,12 @@ export const updateScanObject = async (id: ScanResult['id'], updateObject: Parti
   });
 }
 
-export const deleteScanObject = async (ids: ScanResult['id'][]): Promise<boolean> => {
+export const deleteScanObject = async (ids: ScanResult['id'][], options?: {fetch?: RequestEvent['fetch']}): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('ids', JSON.stringify(ids));
-    fetch('/api/scans', {method: 'DELETE', body})
+    const request = options?.fetch ?? fetch;
+    request('/api/results', {method: 'DELETE', body})
       .then((res) => {
         res.json()
           .then((res) => {
@@ -57,11 +77,12 @@ export const deleteScanObject = async (ids: ScanResult['id'][]): Promise<boolean
   });
 }
 
-export const search = async (candidateData: ScanResult['details']): Promise<{ title: string; snippet: string; link: string}[] & { error?: Record<string, string> }> => {
+export const search = async (candidateData: ScanResult['details'], options?: {fetch?: RequestEvent['fetch']}): Promise<{ title: string; snippet: string; link: string}[] & { error?: Record<string, string> }> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('data', JSON.stringify(candidateData));
-    fetch('/api/search', {method: 'POST', body})
+    const request = options?.fetch ?? fetch;
+    request('/api/search', {method: 'POST', body})
       .then((res) => {
         res.json()
           .then((res) => {
@@ -71,12 +92,13 @@ export const search = async (candidateData: ScanResult['details']): Promise<{ ti
   });
 }
 
-export const analyze = async (candidateDetails: string, searchResults: { title: string; snippet: string; link: string}[]): Promise<{estimation: number;  explanation: string}> => {
+export const analyze = async (candidateDetails: string, searchResults: { title: string; snippet: string; link: string}[], options?: {fetch?: RequestEvent['fetch']}): Promise<{estimation: number;  explanation: string}> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('details', JSON.stringify(candidateDetails));
     body.append('results', JSON.stringify(searchResults));
-    fetch('/api/analyze', {method: 'POST', body})
+    const request = options?.fetch ?? fetch;
+    request('/api/analyze', {method: 'POST', body})
       .then((res) => {
         res.json()
           .then((res) => {
