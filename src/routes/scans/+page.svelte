@@ -4,6 +4,7 @@
 	import type { ScanResult } from "$lib/models/scan";
 	import { columns, singleScanformSchema, tableConfiguration } from "./configurations";
 	import * as Dialog from "$lib/components/ui/dialog/index.js";
+	import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
 	import { Button } from "$lib/components/ui/button";
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
@@ -19,6 +20,10 @@
 	let addScanDialogOpened = $state(false);
 	let submitInprogress = $state(false);
 	let fileStructureInstructionsDialogOpened = $state(false);
+	let deleteScansDialogOpened = $state(false);
+	let deleteCandidates: ScanResult[] = [];
+	let deleteInProgress = $state(false);
+	let table: any;
 
 	const singleScanForm = superForm({name: '', email: '', address: ''}, {
 		validators: zodClient(singleScanformSchema),
@@ -65,8 +70,8 @@
 			})
 	}
 
-	async function sendToScan(preScan: OmittedScanResult) {		
-		const scanToUpdate = scans.find((scan) => scan.id === preScan.id);
+	async function sendToScan(toScan: OmittedScanResult) {		
+		const scanToUpdate = scans.find((scan) => scan.id === toScan.id);
 		if (!scanToUpdate) {
 			// error
 			return;
@@ -92,22 +97,42 @@
 	function onBulkActions(e: {type: string; data: any}) {
 		switch (e?.type) {
 			case 'delete':
-				const idsToDelete = e.data.map((item: ScanResult) => item.id);
-				idsToDelete.forEach((id: ScanResult['id']) => {
-					const scanToDeleteIndex = scans.findIndex((scan) => scan.id === id);
-					if (scanToDeleteIndex > -1) {
-						scans.splice(scanToDeleteIndex, 1);
-						scans = [...scans];
-					}
-				})
-				deleteScanObject(idsToDelete);
+				deleteScansDialogOpened = true;
+				deleteCandidates = e.data;
 				break;
 			case 'scan':
-				console.log(e.data)
+				e.data?.forEach((toRescan: OmittedScanResult) => {
+					sendToScan(toRescan);
+				});
+				table?.resetSelection && table?.resetSelection();
 				break;
 			default:
 				break;
 		}
+	}
+
+	function onDelete(items: ScanResult[]) {
+		const idsToDelete = items.map((item: ScanResult) => item.id);
+		deleteInProgress = true;
+		const finalized = () => {
+			deleteCandidates = [];
+			deleteScansDialogOpened = false;
+			table?.resetSelection && table?.resetSelection();
+		}
+		deleteScanObject(idsToDelete)
+			.then((deleteRes) => {
+				deleteInProgress = false;
+				if (deleteRes) {
+					idsToDelete.forEach((id: ScanResult['id']) => {
+						const scanToDeleteIndex = scans.findIndex((scan) => scan.id === id);
+						if (scanToDeleteIndex > -1) {
+							scans.splice(scanToDeleteIndex, 1);
+							scans = [...scans];
+						}
+					})
+				}
+				finalized();
+			}, _ => finalized());
 	}
 
 	function onRowClick(e: {type: string; data: any}) {
@@ -117,7 +142,8 @@
 	}
 
 </script>
-<AppTable { columns } data={scans} 
+<AppTable { columns } data={scans}
+	bind:this={table}
 	configuration={tableConfiguration} 
 	addData={() => setScanDialogOpenState(true)} 
 	bulkActions={onBulkActions}
@@ -227,3 +253,27 @@
 		</div>
   </Dialog.Content>
 </Dialog.Root>
+
+
+<AlertDialog.Root bind:open={deleteScansDialogOpened}>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+			<AlertDialog.Description>
+				This action cannot be undone. This will permanently delete the selected scan results.
+			</AlertDialog.Description>
+		</AlertDialog.Header>
+		<AlertDialog.Footer>
+			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+			<AlertDialog.Action 
+				disabled={deleteInProgress || submitInprogress}
+				onclick={() => onDelete(deleteCandidates)} 
+				class="bg-destructive text-destructive-foreground hover:bg-destructive/50 flex flex-row gap-2 items-center">
+				{#if deleteInProgress}
+					<LoaderCircle size=14 class="animate-spin"/>
+				{/if}
+				<span>DELETE</span>
+			</AlertDialog.Action>
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>

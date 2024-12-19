@@ -14,7 +14,6 @@
 	import EmptyResults from "../empty-results/empty-results.svelte";
 	import { type TableConfiguration } from "$lib/models/table";
 	import Menu from "../menu/menu.svelte";
-	import { preventDefault, stopPropagation } from "svelte/legacy";
 
   type DataTableProps<TData, TValue> = {
    columns: ColumnDef<TData, TValue>[];
@@ -79,6 +78,13 @@
     if (configuration.onRowClick.ignoreColumns?.includes(columnId)) { return; }
     rowClick && 
     rowClick({type: configuration.onRowClick.event, data})
+  }
+
+  /**
+   * Used outside of the component to reset row selection
+   */
+  function resetSelection() {
+    table.resetRowSelection();
   }
  </script>
   
