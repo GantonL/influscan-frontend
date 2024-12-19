@@ -14,6 +14,17 @@ export const getScans = async (user_id: string): Promise<CastScanResult[]> => {
   return data ?? [];
 };
 
+export const getScan = async (user_id: string, id: ScanResult['id']): Promise<CastScanResult | undefined> => {
+  const {data, error} = await db.from(Tables.Scans)
+    .select('id, created_at, status, details, estimation, explanation')
+    .eq('user_id', user_id)
+    .eq('id', id)
+  if (error) {
+    console.error('[getScan]', error)
+  }
+  return data?.pop() ?? undefined;
+};
+
 export const createScans = async (user_id: string, scans: (ScanResult | Pick<ScanResult, 'status' | 'details' | 'id'>)[]): Promise<boolean> => {
   const { error } = await db.from(Tables.Scans)
     .insert(
