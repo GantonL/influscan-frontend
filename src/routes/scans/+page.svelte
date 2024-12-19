@@ -15,6 +15,7 @@
 	import { zodClient } from "sveltekit-superforms/adapters";
 	import { Input } from "$lib/components/ui/input";
 	import { goto } from "$app/navigation";
+	import { title } from "$lib/stores";
 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
 	let addScanDialogOpened = $state(false);
@@ -24,6 +25,8 @@
 	let deleteCandidates: ScanResult[] = [];
 	let deleteInProgress = $state(false);
 	let table: any;
+
+	title.set('Scans');
 
 	const singleScanForm = superForm({name: '', email: '', address: ''}, {
 		validators: zodClient(singleScanformSchema),
