@@ -31,6 +31,21 @@ export const scan = async (data: OmittedScanResult, options?: {fetch?: RequestEv
   });
 }
 
+export const rescan = async (data: OmittedScanResult, options?: {fetch?: RequestEvent['fetch']}): Promise<{success: boolean, scanResult?: ScanResult}> => {
+  return new Promise((resolve, reject) => {
+    const body = new FormData();
+    body.append('data', JSON.stringify(data));
+    const request = options?.fetch ?? fetch;
+    request('/api/scan', {method: 'PUT', body})
+      .then((res) => {
+        res.json()
+          .then((res) => {
+            resolve(res);
+          }, reject);
+      }, reject);
+  });
+}
+
 export const createScanObject = async (scan: Omit<ScanResult, 'user_id' | 'created_at'>, options?: {fetch?: RequestEvent['fetch']}): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();

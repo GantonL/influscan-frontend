@@ -1,5 +1,5 @@
 <script lang="ts" generics="TData, TValue">
-  import { type ColumnDef, getCoreRowModel, getPaginationRowModel, type PaginationState, type RowSelectionState, type TableOptions, type VisibilityState } from "@tanstack/table-core";
+  import { type ColumnDef, getCoreRowModel, getPaginationRowModel, getSortedRowModel, type PaginationState, type RowSelectionState, type SortingState, type TableOptions, type VisibilityState } from "@tanstack/table-core";
   import {
    createSvelteTable,
    FlexRender,
@@ -26,12 +26,21 @@
   let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
   let columnVisibility = $state<VisibilityState>({});
   let rowSelection = $state<RowSelectionState>({});
-  
+  let sorting = $state<SortingState>([]);
+
   const tableOptions: TableOptions<any> = ({
     get data() {
       return data;
     },
     columns,
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: (updater) => {
+      if (typeof updater === "function") {
+        sorting = updater(sorting);
+      } else {
+        sorting = updater;
+      }
+    },
     onColumnVisibilityChange: (updater) => {
       if (typeof updater === "function") {
         columnVisibility = updater(columnVisibility);
@@ -62,6 +71,9 @@
       },
       get rowSelection() {
         return rowSelection;
+      },
+      get sorting() {
+        return sorting;
       },
     },
     getCoreRowModel: getCoreRowModel(),

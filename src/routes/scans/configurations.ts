@@ -58,7 +58,11 @@ export const columns: ColumnDef<TableScanResult>[] = [
   },
   {
     accessorKey: 'estimation',
-    header: 'Estimation',
+    header: ({ column }) =>
+      renderComponent(SortableHeader, {
+        label: 'Estimation',
+        onclick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      }),
     cell: ({row}) => {
       const estimation = row.original.estimation;
       if (!estimation) return;
@@ -109,10 +113,11 @@ export const tableConfiguration: TableConfiguration<TableScanResult> = {
 };
 
 import { z } from "zod";
+import SortableHeader from "$lib/components/app-table/sortable-header.svelte";
  
 export const singleScanformSchema = z.object({
   name: z.string().min(3).max(50).trim(),
-  email: z.string().email().optional(),
+  email: z.string().optional(),
   address: z.string().optional(),
 });
  

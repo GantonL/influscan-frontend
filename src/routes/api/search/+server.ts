@@ -8,13 +8,13 @@ export const POST: RequestHandler = async (event) => {
   if (!scanData) {return error(500)};
   const scanCandidate: {name: string, email: string, address: string} = JSON.parse(scanData.toString());
   const results: unknown[] = [];
-  const searchResults = await fetch(`${GoogleCustomSearchUrl}?q="${scanCandidate.name}" AND ("${scanCandidate.email}" OR "${scanCandidate.address}")&cx=${GOOGLE_CUSTOM_SEARCH_ENGINE}&key=${GOOGLE_CUSTOM_SEARCH_API_KEY}&limit=8`)
+  const searchResults = await fetch(`${GoogleCustomSearchUrl}?q="${scanCandidate.name}"&cx=${GOOGLE_CUSTOM_SEARCH_ENGINE}&key=${GOOGLE_CUSTOM_SEARCH_API_KEY}&limit=8`)
   const fromSearch = await searchResults.json();
   if (fromSearch.error) {
     console.error('[Search failed]', fromSearch.error.message);
     return json(fromSearch);
   }
-  const totalResults = Number(fromSearch?.searchInformation?.totalResults ?? 0); 
+  const totalResults = Number(fromSearch?.searchInformation?.totalResults ?? 0);
   if (totalResults > 0) {
     results.push({
       name: scanCandidate.name,

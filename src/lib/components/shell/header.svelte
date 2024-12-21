@@ -5,13 +5,15 @@
 	import SignedIn from 'clerk-sveltekit/client/SignedIn.svelte'
 	import SignedOut from 'clerk-sveltekit/client/SignedOut.svelte'
 	import Button from "../ui/button/button.svelte";
+	import { Radar } from "lucide-svelte";
 </script>
 <header class="grid grid-cols-2 w-full p-2 border-b">
   <div class="flex flex-row items-center gap-4">
     <SignedIn>
       <SidebarTrigger />
     </SignedIn>
-    <h1 class="text-xl">
+    <h1 class="flex flex-row items-center gap-3 text-xl">
+      <Radar />
       <a href="/">InfluScan</a>
     </h1>
   </div>

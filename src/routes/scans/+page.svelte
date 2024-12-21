@@ -9,7 +9,7 @@
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
 	import { HelpCircle, LoaderCircle } from "lucide-svelte";
-	import { buildScanResultObjectFromParsedRawData, deleteScanObject, scan, type OmittedScanResult } from "./utilities";
+	import { buildScanResultObjectFromParsedRawData, deleteScanObject, rescan, scan, type OmittedScanResult } from "./utilities";
 	import * as Form from "$lib/components/ui/form";
 	import { superForm } from "sveltekit-superforms";
 	import { zodClient } from "sveltekit-superforms/adapters";
@@ -96,6 +96,30 @@
 		scanToUpdate.explanation = scanResponse.scanResult.explanation;
 		scanToUpdate.status = scanResponse.scanResult.status;
 	}
+	
+	async function sendToRescan(toScan: OmittedScanResult) {		
+		const scanToUpdate = scans.find((scan) => scan.id === toScan.id);
+		if (!scanToUpdate) {
+			// error
+			return;
+		}
+		scanToUpdate.status = 'in_progress';
+		const scanResponse = await rescan(scanToUpdate)
+		.catch(() => {
+			// handle errors
+			return {
+				success: false,
+				scanResult: scanToUpdate,
+			}
+		});
+		if (!scanResponse.success || !scanResponse.scanResult) {
+			scanToUpdate.status = 'failed';
+			return;
+		}
+		scanToUpdate.estimation = scanResponse.scanResult.estimation; 
+		scanToUpdate.explanation = scanResponse.scanResult.explanation;
+		scanToUpdate.status = scanResponse.scanResult.status;
+	}
 
 	function onBulkActions(e: {type: string; data: any}) {
 		switch (e?.type) {
@@ -105,7 +129,7 @@
 				break;
 			case 'scan':
 				e.data?.forEach((toRescan: OmittedScanResult) => {
-					sendToScan(toRescan);
+					sendToRescan(toRescan);
 				});
 				table?.resetSelection && table?.resetSelection();
 				break;
