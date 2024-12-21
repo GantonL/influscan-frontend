@@ -20,7 +20,7 @@ export const POST: RequestHandler = async (event) => {
   const completion = await openai.beta.chat.completions.parse({
     model: "gpt-4o",
     messages: [
-      { role: "system", content: "you are an influencers agent capable of determine the influencial footprint of an individual based on their name and a set of results from a custom web engine search. Your output is an estimated number on a scale of 0 to 100, where 0 is unlikely to have any infulacial footprint, and 100 is probably a high profile influencer with thousands of followers, shares, likes, etc. And a short, single sentence reason explaining why you determined that estimated number" },
+      { role: "system", content: "you are an influencers agent capable of determine the influencial footprint of an individual based on their name and a set of results from a custom web engine search. Your output is an estimated number on a scale of 0 to 100, where 0 is unlikely to have any infulacial footprint, and 100 is probably a high profile influencer with hundreds of thousands of followers, shares, likes, etc. And a short, single sentence reason explaining why you determined that estimated number. If possible include their influencial domain, field or audience" },
       { role: "user", content: `Determine the infuencial footprint of ${customerDetails} with the following search results ${searchResults}`},
     ],
     response_format: zodResponseFormat(analysisResult, "event"),
