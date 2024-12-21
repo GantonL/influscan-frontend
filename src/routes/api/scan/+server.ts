@@ -1,6 +1,7 @@
 import { error, json, type RequestEvent, type RequestHandler } from "@sveltejs/kit";
 import { analyze, createScanObject, search, updateScanObject } from "../../scans/utilities";
 import { type ScanResult } from '$lib/models/scan';
+import type { GoogleCustomSearchEngineResult } from "$lib/models/search";
 
 export const POST: RequestHandler = async ({request, locals, fetch}) => {
   const data = await request.formData();
@@ -17,7 +18,14 @@ export const POST: RequestHandler = async ({request, locals, fetch}) => {
   if (searchResults.error) {
     return handleFailedScan(parsedScanData, response, { fetch });
   }
-  const analysisResult = await analyze(parsedScanData.details.name , searchResults, { fetch });
+  const analysisObjects: Pick<GoogleCustomSearchEngineResult, 'title' | 'snippet' | 'link'>[] = searchResults.map(result => {
+    return {
+      title: result.title,
+      snippet: result.snippet,
+      link: result.link,
+    }
+  }) 
+  const analysisResult = await analyze(parsedScanData.details.name , analysisObjects, { fetch });
   if (!analysisResult) {
     return handleFailedScan(parsedScanData, response, { fetch });
   }

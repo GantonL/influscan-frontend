@@ -1,4 +1,5 @@
 import type { ScanResult } from "$lib/models/scan";
+import type { GoogleCustomSearchEngineResult } from "$lib/models/search";
 import type { RequestEvent } from "./$types";
 
 export type OmittedScanResult = Omit<ScanResult, 'user_id' | 'created_at'>; 
@@ -92,7 +93,7 @@ export const deleteScanObject = async (ids: ScanResult['id'][], options?: {fetch
   });
 }
 
-export const search = async (candidateData: ScanResult['details'], options?: {fetch?: RequestEvent['fetch']}): Promise<{ title: string; snippet: string; link: string}[] & { error?: Record<string, string> }> => {
+export const search = async (candidateData: ScanResult['details'], options?: {fetch?: RequestEvent['fetch']}): Promise<GoogleCustomSearchEngineResult[] & { error?: Record<string, string> }> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('data', JSON.stringify(candidateData));
@@ -107,7 +108,7 @@ export const search = async (candidateData: ScanResult['details'], options?: {fe
   });
 }
 
-export const analyze = async (candidateDetails: string, searchResults: { title: string; snippet: string; link: string}[], options?: {fetch?: RequestEvent['fetch']}): Promise<{estimation: number;  explanation: string}> => {
+export const analyze = async (candidateDetails: string, searchResults: Pick<GoogleCustomSearchEngineResult, 'title' | 'snippet' | 'link'>[], options?: {fetch?: RequestEvent['fetch']}): Promise<{estimation: number;  explanation: string}> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('details', JSON.stringify(candidateDetails));
