@@ -112,7 +112,7 @@ import { z } from "zod";
  
 export const singleScanformSchema = z.object({
   name: z.string().min(3).max(50).trim(),
-  email: z.string().email().optional(),
+  email: z.string().optional(),
   address: z.string().optional(),
 });
  
