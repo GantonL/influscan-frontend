@@ -1,4 +1,4 @@
-import type { ScanResult } from "$lib/models/scan";
+import type { AnalysisResult, ScanResult } from "$lib/models/scan";
 import type { GoogleCustomSearchEngineResult } from "$lib/models/search";
 import type { RequestEvent } from "./$types";
 
@@ -62,7 +62,7 @@ export const createScanObject = async (scan: Omit<ScanResult, 'user_id' | 'creat
   });
 }
 
-export const updateScanObject = async (id: ScanResult['id'], updateObject: Partial<Pick<ScanResult, 'details' | 'estimation' | 'explanation' | 'status'>>, options?: {fetch?: RequestEvent['fetch']}): Promise<boolean> => {
+export const updateScanObject = async (id: ScanResult['id'], updateObject: Partial<Pick<ScanResult, 'details' | 'estimation' | 'explanation' | 'status' | 'domain' | 'niche' | 'rankings'>>, options?: {fetch?: RequestEvent['fetch']}): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('id', id);
@@ -108,7 +108,7 @@ export const search = async (candidateData: ScanResult['details'], options?: {fe
   });
 }
 
-export const analyze = async (candidateDetails: string, searchResults: Pick<GoogleCustomSearchEngineResult, 'title' | 'snippet' | 'link'>[], options?: {fetch?: RequestEvent['fetch']}): Promise<{estimation: number;  explanation: string}> => {
+export const analyze = async (candidateDetails: string, searchResults: Pick<GoogleCustomSearchEngineResult, 'title' | 'snippet' | 'link'>[], options?: {fetch?: RequestEvent['fetch']}): Promise<AnalysisResult> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('details', JSON.stringify(candidateDetails));

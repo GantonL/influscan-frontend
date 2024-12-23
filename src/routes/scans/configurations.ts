@@ -11,7 +11,7 @@ import Checkbox from "$lib/components/checkbox/checkbox.svelte";
 import ScanResultExplanation from "$lib/components/scan-result-explanaiton/scan-result-explanation.svelte";
 import type { TableConfiguration } from "$lib/models/table";
 
-type TableScanResult = Pick<ScanResult, 'details' | 'id' | 'estimation' | 'explanation' | 'status'>;
+type TableScanResult = Pick<ScanResult, 'details' | 'id' | 'estimation' | 'explanation' | 'status' | 'rankings'>;
 
 export const columns: ColumnDef<TableScanResult>[] = [
   {
@@ -70,6 +70,15 @@ export const columns: ColumnDef<TableScanResult>[] = [
     }
   },
   {
+    accessorKey: 'rankings',
+    header: 'Socials',
+    cell: ({row}) => {
+      const rankings = row.original.rankings;
+      if (!rankings) return;
+      return renderComponent(ScanResultRankings, { rankings });
+    }
+  },
+  {
     accessorKey: 'explanation',
     header: 'Explanation',
     cell: ({row}) => {
@@ -114,6 +123,7 @@ export const tableConfiguration: TableConfiguration<TableScanResult> = {
 
 import { z } from "zod";
 import SortableHeader from "$lib/components/app-table/sortable-header.svelte";
+import ScanResultRankings from "$lib/components/scan-result-rankings/scan-result-rankings.svelte";
  
 export const singleScanformSchema = z.object({
   name: z.string().min(3).max(50).trim(),

@@ -8,7 +8,15 @@ export interface ScanResult {
   user_id: string;
   estimation?: number;
   explanation?: string;
+  domain?: string;
+  niche?: string;
+  rankings?: ScanResultRanking[];
 }
+
+export interface ScanResultRanking {
+  platform: string;
+  followers: number;
+} 
 
 export interface ScanResultDetails {
   name: string;
@@ -16,4 +24,12 @@ export interface ScanResultDetails {
   address?: string;
   country?: string;
   extras?: string;
+}
+
+export interface AnalysisResult {
+  estimation: number;
+  explanation: string;
+  domain?: string;
+  niche?: string;
+  rankings?: ScanResult['rankings'];
 }
