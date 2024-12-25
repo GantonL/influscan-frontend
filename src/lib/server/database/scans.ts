@@ -1,7 +1,7 @@
 import type { ScanResult } from "$lib/models/scan";
 import { db, Tables } from ".";
 
-export type CastScanResult = Pick<ScanResult, 'id' | 'created_at' | 'details' | 'estimation' | 'explanation' | 'status'>;
+export type CastScanResult = Pick<ScanResult, 'id' | 'created_at' | 'details' | 'estimation' | 'explanation' | 'status' | 'rankings' | 'images' | 'sources'>;
 
 export const getScans = async (user_id: string): Promise<CastScanResult[]> => {
   const {data, error} = await db.from(Tables.Scans)
@@ -16,7 +16,7 @@ export const getScans = async (user_id: string): Promise<CastScanResult[]> => {
 
 export const getScan = async (user_id: string, id: ScanResult['id']): Promise<CastScanResult | undefined> => {
   const {data, error} = await db.from(Tables.Scans)
-    .select('id, created_at, status, details, estimation, explanation, domain, niche, rankings')
+    .select('id, created_at, status, details, estimation, explanation, domain, niche, rankings, images, sources')
     .eq('user_id', user_id)
     .eq('id', id)
   if (error) {
@@ -44,7 +44,7 @@ export const createScans = async (user_id: string, scans: (ScanResult | Pick<Sca
   return true;
 };
 
-export const updateScan = async (user_id: string, id: ScanResult['id'], updateObject: Partial<Pick<ScanResult, 'details' | 'estimation' | 'explanation' | 'status' | 'domain' | 'niche' | 'rankings'>>): Promise<boolean> => {
+export const updateScan = async (user_id: string, id: ScanResult['id'], updateObject: Partial<Pick<ScanResult, 'details' | 'estimation' | 'explanation' | 'status' | 'domain' | 'niche' | 'rankings' | 'images' | 'sources'>>): Promise<boolean> => {
   const { error } = await db.from(Tables.Scans)
     .update(updateObject)
     .eq('user_id', user_id)

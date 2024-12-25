@@ -58,6 +58,8 @@ const searchAndAnalyze = async (scan: ScanResult, response: {success: boolean, s
   scan.domain = analysisResult.domain;
   scan.niche = analysisResult.niche;
   scan.rankings = analysisResult.rankings;
+  scan.images = analysisResult.images;
+  scan.sources = analysisResult.sources;
   scan.status = 'completed'; 
   const updateScanObjectRes = await updateScanObject(scan.id, { 
     status: scan.status, 

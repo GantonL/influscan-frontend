@@ -95,6 +95,7 @@
 		scanToUpdate.estimation = scanResponse.scanResult.estimation; 
 		scanToUpdate.explanation = scanResponse.scanResult.explanation;
 		scanToUpdate.status = scanResponse.scanResult.status;
+		scanToUpdate.rankings = scanResponse.scanResult.rankings;
 	}
 	
 	async function sendToRescan(toScan: OmittedScanResult) {		
@@ -119,6 +120,7 @@
 		scanToUpdate.estimation = scanResponse.scanResult.estimation; 
 		scanToUpdate.explanation = scanResponse.scanResult.explanation;
 		scanToUpdate.status = scanResponse.scanResult.status;
+		scanToUpdate.rankings = scanResponse.scanResult.rankings;
 	}
 
 	function onBulkActions(e: {type: string; data: any}) {

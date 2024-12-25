@@ -66,7 +66,7 @@ export const columns: ColumnDef<TableScanResult>[] = [
     cell: ({row}) => {
       const estimation = row.original.estimation;
       if (!estimation) return;
-      return renderComponent(ScanResultEstimation, { estimation });
+      return renderComponent(ScanResultEstimation, { estimation, size: 16 });
     }
   },
   {

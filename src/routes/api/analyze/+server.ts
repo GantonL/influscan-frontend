@@ -21,13 +21,22 @@ export const POST: RequestHandler = async (event) => {
       platform: z.string(),
       followers: z.number(),
     })).optional(),
+    images: z.array(z.string()).optional(),
+    sources: z.array(z.string()).optional(),
   });
 
   const completion = await openai.beta.chat.completions.parse({
     model: "gpt-4o",
     messages: [
-      { role: "system", content: "you are an influencers agent capable of determine the influencial footprint of an individual based on their name and a set of results from a custom web engine search. Your output is an estimated number on a scale of 0 to 100, where 0 is unlikely to have any infulacial footprint, and 100 is probably a high profile influencer with hundreds of thousands of followers, shares, likes, etc. And a short, single sentence reason explaining why you determined that estimated number. If possible include their influencial domain and niche. If possible, rankings object should include amount of followers per platform" },
-      { role: "user", content: `Determine the infuencial footprint of ${customerDetails} with the following search results ${searchResults}`},
+      { role: "system", 
+        content: `you are an influencers agent capable of determine the influencial footprint of an individual based on their name and a set of results from a custom web search engine. 
+        Your output is an estimated number on a scale of 0 to 100, where 0 is unlikely to have any infulacial footprint, and 100 is probably a high profile influencer with hundreds of thousands of followers, shares, likes, etc. And a short, single sentence reason explaining why you determined that estimated number.
+        If possible include their influencial domain and niche. 
+        If possible, rankings object should include amount of followers per platform.
+        Images should include only relevant images that most likley to match this individual.
+        Sources should include the relevant links to your determination.`
+      },
+      { role: "user", content: `Determine the infuencial footprint of ${customerDetails}. Search results: ${searchResults}`},
     ],
     response_format: zodResponseFormat(analysisResult, "event"),
   });

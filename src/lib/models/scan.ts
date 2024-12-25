@@ -11,6 +11,8 @@ export interface ScanResult {
   domain?: string;
   niche?: string;
   rankings?: ScanResultRanking[];
+  images?: string[];
+  sources?: string[];
 }
 
 export interface ScanResultRanking {
@@ -27,9 +29,11 @@ export interface ScanResultDetails {
 }
 
 export interface AnalysisResult {
-  estimation: number;
-  explanation: string;
-  domain?: string;
-  niche?: string;
+  estimation: ScanResult['estimation'];
+  explanation: ScanResult['explanation'];
+  domain?: ScanResult['domain'];
+  niche?: ScanResult['niche'];
   rankings?: ScanResult['rankings'];
+  images?: ScanResult['images'];
+  sources?: ScanResult['sources'];
 }
