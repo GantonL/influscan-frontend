@@ -6,7 +6,6 @@ import { createRawSnippet } from "svelte";
 import Trash2 from "lucide-svelte/icons/trash-2";
 import Radar from "lucide-svelte/icons/radar";
 import TableOfContents from "lucide-svelte/icons/table-of-contents";
-import ScanResultEstimation from "$lib/components/scan-result-estimation/scan-result-estimation.svelte";
 import Checkbox from "$lib/components/checkbox/checkbox.svelte";
 import ScanResultExplanation from "$lib/components/scan-result-explanaiton/scan-result-explanation.svelte";
 import type { TableConfiguration } from "$lib/models/table";
@@ -66,7 +65,7 @@ export const columns: ColumnDef<TableScanResult>[] = [
     cell: ({row}) => {
       const estimation = row.original.estimation;
       if (!estimation) return;
-      return renderComponent(ScanResultEstimation, { estimation, size: 16 });
+      return renderComponent(Gauge, { value: estimation });
     }
   },
   {
@@ -124,6 +123,7 @@ export const tableConfiguration: TableConfiguration<TableScanResult> = {
 import { z } from "zod";
 import SortableHeader from "$lib/components/app-table/sortable-header.svelte";
 import ScanResultRankings from "$lib/components/scan-result-rankings/scan-result-rankings.svelte";
+import Gauge from "$lib/components/gauge/gauge.svelte";
  
 export const singleScanformSchema = z.object({
   name: z.string().min(3).max(50).trim(),

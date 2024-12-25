@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { page } from "$app/stores";
 	import Menu from "$lib/components/menu/menu.svelte";
-	import ScanResultEstimation from "$lib/components/scan-result-estimation/scan-result-estimation.svelte";
 	import * as Card from "$lib/components/ui/card";
 	import type { ScanResult } from "$lib/models/scan";
 	import { title } from "$lib/stores";
 	import { ChartNoAxesColumnIncreasing, ExternalLink, Image, LandPlot, Puzzle, Star } from "lucide-svelte";
 	import { actionsMenuConfiguration } from "./configurations";
 	import ScanResultRankings from "$lib/components/scan-result-rankings/scan-result-rankings.svelte";
+	import Gauge from "$lib/components/gauge/gauge.svelte";
 
 	let scanResult: ScanResult = $page.data.scanResult;
   title.set(`${scanResult.details.name} | Scan Result`);
@@ -32,7 +32,7 @@
 						<ChartNoAxesColumnIncreasing />
 						<h3>Latest Estimation</h3>
 					</div>
-					<ScanResultEstimation estimation={scanResult.estimation}/>
+					<Gauge value={scanResult.estimation ?? 0}/>
 				</div>
 				<div class="flex flex-col gap-4 border rounded-md p-4 w-fit">
 					<div class="flex flex-row items-center gap-2">

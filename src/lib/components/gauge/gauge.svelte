@@ -27,7 +27,7 @@
   </svg>
 
   <!-- Value Text -->
-  <div class="absolute transform translate-x-1/2 right-1/2 top-1 translate-y-1/2 ">
+  <div class="absolute transform translate-x-1/2 right-1/2 top-2 translate-y-1/2 ">
     <span class="font-bold">{value}%</span>
   </div>
 </div>
