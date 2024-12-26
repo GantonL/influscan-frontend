@@ -4,7 +4,7 @@ import type { RequestEvent } from "./$types";
 
 export type OmittedScanResult = Omit<ScanResult, 'user_id' | 'created_at'>; 
 
-export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, string>): Omit<ScanResult, 'user_id' | 'created_at'> => {
+export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, string>): Pick<ScanResult, 'id' | 'status' | 'details'> => {
   return {
     id: `${crypto.randomUUID()}`,
     status: 'not_started',

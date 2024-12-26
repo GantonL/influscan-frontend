@@ -59,7 +59,10 @@
 		fetch('/api/file-handler/parse-csv', {method: 'POST', body})
 			.then((res) => {
 				res.json().then((parsedData: {name: string, email: string, address: string}[]) => {
-					const newScans = parsedData.map((d) => buildScanResultObjectFromParsedRawData(d));
+					const newScans = parsedData
+						.filter((pd) => pd?.name)
+						.map((d) => buildScanResultObjectFromParsedRawData(d));
+					if (newScans?.length === 0) { return; }
 					scans = [...newScans, ...scans];
 					newScans.forEach((scanRes) => {
 						sendToScan(scanRes);
