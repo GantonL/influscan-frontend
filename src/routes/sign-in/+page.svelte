@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { title } from '$lib/stores';
 	import SignIn from 'clerk-sveltekit/client/SignIn.svelte';
-	title.set('Sign-in')
+	title.set('Sign in')
 </script>
 
 <div>

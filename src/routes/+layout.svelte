@@ -6,7 +6,7 @@
   import "../app.css";
   import { ModeWatcher } from "mode-watcher";
   import { title } from "$lib/stores";
-
+  import { Toaster } from "$lib/components/ui/sonner";
   let { children } = $props();
 </script>
 <svelte:head>
@@ -21,3 +21,4 @@
     {@render children?.()}
   </Shell>
 </Sidebar.Provider>
+<Toaster />

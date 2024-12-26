@@ -20,6 +20,7 @@
     "prettier-plugin-svelte": "^3.2.6",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
+    "svelte-sonner": "^0.3.28",
     "sveltekit-superforms": "^2.21.1",
     "tailwind-merge": "^2.5.5",
     "tailwind-variants": "^0.3.0",

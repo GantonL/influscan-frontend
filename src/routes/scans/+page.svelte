@@ -16,6 +16,7 @@
 	import { Input } from "$lib/components/ui/input";
 	import { goto } from "$app/navigation";
 	import { title } from "$lib/stores";
+	import { toast } from "svelte-sonner";
 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
 	let addScanDialogOpened = $state(false);
@@ -62,7 +63,13 @@
 					const newScans = parsedData
 						.filter((pd) => pd?.name)
 						.map((d) => buildScanResultObjectFromParsedRawData(d));
-					if (newScans?.length === 0) { return; }
+					if (newScans?.length === 0) { 
+						toast.error('This file has invalid structure or it is empty, no scans to execute.');
+						return; 
+					}
+					if (parsedData.length > newScans.length) {
+						toast.info(`${parsedData.length - newScans.length} items are invalid and has been filtered out.`);
+					}
 					scans = [...newScans, ...scans];
 					newScans.forEach((scanRes) => {
 						sendToScan(scanRes);
@@ -161,7 +168,10 @@
 							scans.splice(scanToDeleteIndex, 1);
 							scans = [...scans];
 						}
-					})
+					});
+					toast.success(`Successfully deleted selected items.`)
+				} else {
+					toast.error('Failed to delete selected items.')
 				}
 				finalized();
 			}, _ => finalized());
