@@ -1,3 +1,5 @@
+import type { ScansSettings } from '$lib/models/settings';
+import { getScansSettings } from '$lib/server/database/scans-settings';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -5,8 +7,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     return;
   }
   const userId = locals.session.id;
-  // const settings: Settings = await getSettings(userId); 
+  const scansSettings: Omit<ScansSettings, 'user_id'> | undefined = await getScansSettings(userId); 
   return {
-    // settings,
+    scansSettings,
   }
 }
