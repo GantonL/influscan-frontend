@@ -9,7 +9,7 @@
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
 	import { HelpCircle, LoaderCircle } from "lucide-svelte";
-	import { buildScanResultObjectFromParsedRawData, deleteScanObject, rescan, scan, type OmittedScanResult } from "./utilities";
+	import { buildScanResultObjectFromParsedRawData, createScanObject, deleteScanObject, rescan, scan, type OmittedScanResult } from "./utilities";
 	import * as Form from "$lib/components/ui/form";
 	import { superForm } from "sveltekit-superforms";
 	import { zodClient } from "sveltekit-superforms/adapters";
@@ -17,8 +17,10 @@
 	import { goto } from "$app/navigation";
 	import { title } from "$lib/stores";
 	import { toast } from "svelte-sonner";
+	import type { ScansSettings } from "$lib/models/settings";
 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
+  let scansSettings = $state<ScansSettings>($page.data.scansSettings ?? {});
 	let addScanDialogOpened = $state(false);
 	let submitInprogress = $state(false);
 	let fileStructureInstructionsDialogOpened = $state(false);
@@ -38,6 +40,10 @@
 				setScanDialogOpenState(false);
 				const newScan = buildScanResultObjectFromParsedRawData(form.data);
 				scans = [newScan, ...scans];
+				if (!scansSettings?.start_scans_immediately) { 
+					createScanObject(newScan);
+					return;
+				}
 				sendToScan(newScan);
 			}
 		},
@@ -71,6 +77,12 @@
 						toast.info(`${parsedData.length - newScans.length} items are invalid and has been filtered out.`);
 					}
 					scans = [...newScans, ...scans];
+					if (!scansSettings?.start_scans_immediately) {
+						newScans.forEach((scanRes) => {
+							createScanObject(scanRes);
+						});
+						return;
+					}
 					newScans.forEach((scanRes) => {
 						sendToScan(scanRes);
 					})
