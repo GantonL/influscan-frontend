@@ -48,14 +48,18 @@ const handleDynamicCSV = async (parserResult: ParserResult): Promise<ScanResult[
     messages: [
       {
         role: 'system',
-        content: 'You are an expert in converting customers object to new objects. You will figure out and extract the full name of the customer from each object, and convert it to a new object containing the name, DO NOT HALUCINAE AND DO NOT CREATE NAMES THAT DO NOT EXISTS IN THE GIVEN DATA'
+        content: 
+          `Given an array of objects containing customer details, extract only the names of the customers. 
+          The output should be an array of objects with a single field 'name', containing the inferred customer name.
+          Analyze the input and infer the most likely field representing the customer's name.`
       },
       { 
         role: "user", 
-        content: `Convert the following ${parserResult}`
+        content: `Infer from the following ${JSON.stringify(parserResult)}`
       },
     ],
     response_format: zodResponseFormat(parsingResult, "event"),
+    temperature: 0,
   });
 
   return completion.choices[0]?.message?.parsed?.customers ?? [];
