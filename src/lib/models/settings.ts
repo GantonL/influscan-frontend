@@ -3,7 +3,7 @@ import type { ComboboxConfiguration } from "./combobox";
 export interface ScansSettings {
   user_id: string;
   start_scans_immediately: boolean;
-  csv_parser: 'strict' | 'dynamic';
+  csv_parser?: 'strict' | 'dynamic';
 }
 
 interface SettingsBooleanAction {
