@@ -1,6 +1,6 @@
 import type { ScansSettings, SettingsConfiguration } from "$lib/models/settings";
 
-export const ScansSettingsConfigurations: SettingsConfiguration<ScansSettings> = {
+export const ScansSettingsConfigurations: SettingsConfiguration<Omit<ScansSettings, 'user_id'>> = {
   title: 'Scans',
   items: [
     {
@@ -12,11 +12,23 @@ export const ScansSettingsConfigurations: SettingsConfiguration<ScansSettings> =
       }
     },
     {
-      title: 'Parse CSV files with AI',
-      description: 'Use any CSV file structure to initiate scans in multiple mode using our AI engine',
-      path: 'parse_csv_with_ai',
+      title: 'CSV Parser',
+      description: 'Choose the parsing method of CSV files',
+      path: 'csv_parser',
       action: {
-        type: 'boolean'
+        type: 'choises',
+        options: [
+          {
+            label: 'Strict',
+            value: 'strict',
+            description: 'Parse with a strict policy, using predefined required fields.'
+          },
+          {
+            label: 'Dynamic',
+            value: 'dynamic',
+            description: 'Let us figure out the fields we need.'
+          }
+        ]
       }
     }
   ]

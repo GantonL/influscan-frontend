@@ -18,5 +18,10 @@ export const createUser = async (user: User): Promise<boolean> => {
     console.error('[createUser]', error);
     return false;
   }
+  const { error: scanSettingsError } = await db.from(Tables.ScansSettings)
+    .insert({user_id: user.id});
+  if (scanSettingsError) {
+    console.error('[createUser | default scan settings]', scanSettingsError);
+  }
   return true;
 };

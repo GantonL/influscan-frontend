@@ -1,16 +1,25 @@
+import type { ComboboxConfiguration } from "./combobox";
+
 export interface ScansSettings {
   user_id: string;
   start_scans_immediately: boolean;
-  parse_csv_with_ai: boolean;
+  csv_parser: 'strict' | 'dynamic';
+}
+
+interface SettingsBooleanAction {
+  type: 'boolean',
+}
+
+interface SettingsChoisesAction {
+  type: 'choises',
+  options: ComboboxConfiguration['options'];
 }
 
 interface SettingsItemConfiguration<T> {
   title: string;
   description: string;
   path: keyof T;
-  action: {
-    type: 'boolean'
-  }
+  action: SettingsBooleanAction | SettingsChoisesAction
 }
 
 export interface SettingsConfiguration<T> {
