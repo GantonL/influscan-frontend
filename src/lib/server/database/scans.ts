@@ -19,10 +19,11 @@ export const getScan = async (user_id: string, id: ScanResult['id']): Promise<Ca
     .select('id, created_at, status, details, estimation, explanation, domain, niche, rankings, images, sources')
     .eq('user_id', user_id)
     .eq('id', id)
+    .maybeSingle();
   if (error) {
     console.error('[getScan]', error)
   }
-  return data?.pop() ?? undefined;
+  return data ?? undefined;
 };
 
 export const createScans = async (user_id: string, scans: (ScanResult | Pick<ScanResult, 'status' | 'details' | 'id'>)[]): Promise<boolean> => {

@@ -5,10 +5,11 @@ export const getUser = async (id: User['id']): Promise<User | undefined> => {
   const {data, error} = await db.from(Tables.Users)
     .select('id, name')
     .eq('id', id)
+    .maybeSingle();
   if (error) {
     console.error('[getUser]', error)
   }
-  return data && data?.length > 0 ? data.pop() : undefined;
+  return data ?? undefined;
 };
 
 export const createUser = async (user: User): Promise<boolean> => {
