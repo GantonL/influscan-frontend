@@ -1,6 +1,7 @@
 <script>
 	import ThemeSwitcher from "../theme-switcher/theme-switcher.svelte";
 	import { Trigger as SidebarTrigger } from "../ui/sidebar";
+	import { Badge } from "../ui/badge";
   import UserButton from 'clerk-sveltekit/client/UserButton.svelte'
 	import SignedIn from 'clerk-sveltekit/client/SignedIn.svelte'
 	import SignedOut from 'clerk-sveltekit/client/SignedOut.svelte'
@@ -15,6 +16,7 @@
     <h1 class="flex flex-row items-center gap-3 text-xl">
       <Radar />
       <a href="/">InfluScan</a>
+      <Badge variant="secondary">Preview</Badge>
     </h1>
   </div>
   <div class="flex flex-row justify-end items-center gap-2">

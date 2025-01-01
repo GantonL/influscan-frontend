@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Avatar from "$lib/components/avatar/avatar.svelte";
 	import { Button } from "$lib/components/ui/button";
 	import { title } from "$lib/stores";
 	import SignedIn from "clerk-sveltekit/client/SignedIn.svelte";
