@@ -85,7 +85,7 @@
 					}
 					newScans.forEach((scanRes) => {
 						sendToScan(scanRes);
-					})
+					});
 				})
 			})
 			.finally(() => {

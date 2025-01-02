@@ -5,6 +5,7 @@
 	import CircelDashed from "lucide-svelte/icons/circle-dashed";
 	import ClockAlert from "lucide-svelte/icons/clock-alert";
   import * as Tooltip from "$lib/components/ui/tooltip";
+	import { ListEnd } from "lucide-svelte";
 
   let { status }: {status: ScanStatus} = $props();
   interface StatusConfiguration {
@@ -17,7 +18,8 @@
     'completed': {icon: CircleCheckBig, class: 'text-green-500', tooltip: 'Completed'},
     'failed': {icon: CircelX, class: 'text-destructive', tooltip: 'Failed'},
     'in_progress': {icon: CircelDashed, class: 'text-yellow-500 animate-spin', tooltip: 'In progress'},
-    'not_started': {icon: ClockAlert, class: 'text-muted-foreground', tooltip: 'Not started'}
+    'not_started': {icon: ClockAlert, class: 'text-muted-foreground', tooltip: 'Not started'},
+    'queued': {icon: ListEnd, class: 'text-muted-foreground', tooltip: 'Queued'},
   }
 </script>
 {#snippet selectedStatus(statusConfiguration: StatusConfiguration)}
