@@ -5,6 +5,7 @@
 	import CircleHelp from "lucide-svelte/icons/circle-help";
 	import Send from "lucide-svelte/icons/send";
 	import { page } from "$app/stores";
+	import { onMount } from "svelte";
   
   const groups = [
     {
@@ -43,6 +44,16 @@
     }
   ];
   let currentPath = $derived($page.url.pathname);
+
+  let sidebar: { isMobile: boolean, toggle: () => void };
+  onMount(() => {
+    sidebar = Sidebar.useSidebar();
+  });
+
+  function onSidebarLink() {
+    if (!sidebar.isMobile) { return; }
+    sidebar.toggle();
+  }
  </script>
   
  <Sidebar.Root collapsible="icon">
@@ -59,7 +70,7 @@
             <Sidebar.MenuButton 
               isActive={currentPath.startsWith(item.url)}>
               {#snippet child({ props })}
-              <a href={item.url} {...props}>
+              <a href={item.url} {...props} onclick={onSidebarLink}>
                 <item.icon />
                 <span>{item.title}</span>
               </a>

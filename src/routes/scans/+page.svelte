@@ -18,6 +18,8 @@
 	import { title } from "$lib/stores";
 	import { toast } from "svelte-sonner";
 	import type { ScansSettings } from "$lib/models/settings";
+	import { onDestroy, onMount } from "svelte";
+	import { browser } from "$app/environment";
 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
   let scansSettings = $state<ScansSettings>($page.data.scansSettings ?? {});
@@ -28,8 +30,37 @@
 	let deleteCandidates: ScanResult[] = [];
 	let deleteInProgress = $state(false);
 	let table: any;
+	let worker: Worker;
 
 	title.set('Scans');
+
+	onMount(() => {
+		initializeWorker();
+	});
+
+	onDestroy(() => {
+		worker?.terminate();
+	})
+
+	async function initializeWorker() {
+    if (!browser) { return; }
+		if (!window.Worker) { return; }
+		const workerFile = await import('./worker.ts?worker');
+		worker = new workerFile.default;
+    worker.onmessage = ({ data }) => {
+			const result = data.scanResult;
+			const scanToUpdate = scans.find(scan => scan.id === result.id);
+			if (!scanToUpdate) { return; }
+			if (data.success === false || !result) {
+				scanToUpdate.status = 'failed';
+				return;
+			}
+			scanToUpdate.estimation = result.estimation; 
+			scanToUpdate.explanation = result.explanation;
+			scanToUpdate.status = result.status;
+			scanToUpdate.rankings = result.rankings;
+		}
+	}
 
 	const singleScanForm = superForm({name: '', email: '', address: ''}, {
 		validators: zodClient(singleScanformSchema),
@@ -44,7 +75,8 @@
 					createScanObject(newScan);
 					return;
 				}
-				sendToScan(newScan);
+				newScan.status = 'in_progress';
+				worker?.postMessage({task: 'scan', items: [newScan]});
 			}
 		},
 		onError: () => {
@@ -83,9 +115,8 @@
 						});
 						return;
 					}
-					newScans.forEach((scanRes) => {
-						sendToScan(scanRes);
-					})
+					newScans.forEach(scan => scan.status = 'queued');
+					worker?.postMessage({task: 'scan', items: newScans});
 				})
 			})
 			.finally(() => {
@@ -95,56 +126,6 @@
 			})
 	}
 
-	async function sendToScan(toScan: OmittedScanResult) {		
-		const scanToUpdate = scans.find((scan) => scan.id === toScan.id);
-		if (!scanToUpdate) {
-			// error
-			return;
-		}
-		scanToUpdate.status = 'in_progress';
-		const scanResponse = await scan(scanToUpdate)
-		.catch(() => {
-			// handle errors
-			return {
-				success: false,
-				scanResult: scanToUpdate,
-			}
-		});
-		if (!scanResponse.success || !scanResponse.scanResult) {
-			scanToUpdate.status = 'failed';
-			return;
-		}
-		scanToUpdate.estimation = scanResponse.scanResult.estimation; 
-		scanToUpdate.explanation = scanResponse.scanResult.explanation;
-		scanToUpdate.status = scanResponse.scanResult.status;
-		scanToUpdate.rankings = scanResponse.scanResult.rankings;
-	}
-	
-	async function sendToRescan(toScan: OmittedScanResult) {		
-		const scanToUpdate = scans.find((scan) => scan.id === toScan.id);
-		if (!scanToUpdate) {
-			// error
-			return;
-		}
-		scanToUpdate.status = 'in_progress';
-		const scanResponse = await rescan(scanToUpdate)
-		.catch(() => {
-			// handle errors
-			return {
-				success: false,
-				scanResult: scanToUpdate,
-			}
-		});
-		if (!scanResponse.success || !scanResponse.scanResult) {
-			scanToUpdate.status = 'failed';
-			return;
-		}
-		scanToUpdate.estimation = scanResponse.scanResult.estimation; 
-		scanToUpdate.explanation = scanResponse.scanResult.explanation;
-		scanToUpdate.status = scanResponse.scanResult.status;
-		scanToUpdate.rankings = scanResponse.scanResult.rankings;
-	}
-
 	function onBulkActions(e: {type: string; data: any}) {
 		switch (e?.type) {
 			case 'delete':
@@ -152,9 +133,15 @@
 				deleteCandidates = e.data;
 				break;
 			case 'scan':
-				e.data?.forEach((toRescan: OmittedScanResult) => {
-					sendToRescan(toRescan);
-				});
+				const idsOfCandidates = (e.data as OmittedScanResult[]).map(i => i.id);
+				const toRescan = scans
+													.filter(scan => idsOfCandidates.includes(scan.id))
+													.filter(scan => scan.status !== 'queued' && scan.status !== 'in_progress');
+				if (toRescan.length < idsOfCandidates.length) {
+					toast.info(`${idsOfCandidates.length - toRescan.length} items are already in progress or queued and has been filtered out.`);
+				}
+				toRescan.forEach(scan => scan.status = 'queued');
+				worker?.postMessage({task: 'rescan', items: e.data});
 				table?.resetSelection && table?.resetSelection();
 				break;
 			default:
