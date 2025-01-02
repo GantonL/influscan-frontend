@@ -68,3 +68,15 @@ export const deleteScans = async (user_id: string, ids: string[]): Promise<boole
   }
   return true;
 };
+
+export const totalMonthlyScansCount = async (user_id: string): Promise<number> => {
+  const { data, error } = await db.from(Tables.UsersStats)
+    .select("total_monthly_scans")
+    .eq('user_id', user_id)
+    .single()
+  if (error) {
+    console.error('[countScans]', error);
+    return 0;
+  }
+  return data?.total_monthly_scans ?? 0;
+}
