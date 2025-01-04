@@ -48,8 +48,11 @@
 		const workerFile = await import('./worker.ts?worker');
 		worker = new workerFile.default;
     worker.onmessage = ({ data }) => {
+			if (data.message) {
+				toast.error(data.message);
+			}
 			const result = data.scanResult;
-			const scanToUpdate = scans.find(scan => scan.id === result.id);
+			const scanToUpdate = scans.find(scan => scan.id === result?.id);
 			if (!scanToUpdate) { return; }
 			if (data.success === false || !result) {
 				scanToUpdate.status = 'failed';

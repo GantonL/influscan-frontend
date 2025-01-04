@@ -17,7 +17,7 @@ export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, s
   }
 }
 
-export const scan = async (data: OmittedScanResult, options?: {fetch?: RequestEvent['fetch']}): Promise<{success: boolean, scanResult?: ScanResult}> => {
+export const scan = async (data: OmittedScanResult, options?: {fetch?: RequestEvent['fetch']}): Promise<{success: boolean, scanResult?: ScanResult, message?: string}> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('data', JSON.stringify(data));
@@ -32,7 +32,7 @@ export const scan = async (data: OmittedScanResult, options?: {fetch?: RequestEv
   });
 }
 
-export const rescan = async (data: OmittedScanResult, options?: {fetch?: RequestEvent['fetch']}): Promise<{success: boolean, scanResult?: ScanResult}> => {
+export const rescan = async (data: OmittedScanResult, options?: {fetch?: RequestEvent['fetch']}): Promise<{success: boolean, scanResult?: ScanResult, message?: string}> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('data', JSON.stringify(data));

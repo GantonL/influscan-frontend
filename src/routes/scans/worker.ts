@@ -19,8 +19,13 @@ async function batchScan(items: OmittedScanResult[]) {
 			return {
 				success: false,
 				scanResult: item,
+        message: '',
 			}
 		});
+    if (!result || result.message?.length) {
+      result.success = false;
+      result.scanResult = item;
+    }
     postMessage(result);
   }
 }
@@ -33,8 +38,13 @@ async function batchRescan(items: OmittedScanResult[]) {
 			return {
 				success: false,
 				scanResult: item,
+        message: '',
 			}
 		});
+    if (!result || result.message?.length) {
+      result.success = false;
+      result.scanResult = item;
+    }
     postMessage(result);
   }
 }

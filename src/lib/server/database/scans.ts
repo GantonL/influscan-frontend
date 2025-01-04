@@ -71,7 +71,7 @@ export const deleteScans = async (user_id: string, ids: string[]): Promise<boole
 
 export const totalMonthlyScansCount = async (user_id: string): Promise<number> => {
   const { data, error } = await db.from(Tables.UsersStats)
-    .select("total_monthly_scans")
+    .select('total_monthly_scans')
     .eq('user_id', user_id)
     .single()
   if (error) {
@@ -79,4 +79,10 @@ export const totalMonthlyScansCount = async (user_id: string): Promise<number> =
     return 0;
   }
   return data?.total_monthly_scans ?? 0;
+}
+
+export const updateTotalMonthlyScanCount = async (user_id: string): Promise<boolean> => {
+  const { error: incrementError } = await db.rpc('increment_total_monthly_scans_count', {userid: user_id});
+  if (incrementError) { return false; }
+  return true;
 }
