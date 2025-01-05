@@ -20,6 +20,7 @@
 	import type { ScansSettings } from "$lib/models/settings";
 	import { onDestroy, onMount } from "svelte";
 	import { browser } from "$app/environment";
+	import { PlansConfiguration } from "$lib/configurations/plans";
 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
   let scansSettings = $state<ScansSettings>($page.data.scansSettings ?? {});
@@ -31,6 +32,9 @@
 	let deleteInProgress = $state(false);
 	let table: any;
 	let worker: Worker;
+	let scansMonthlyLimit = $state<number>(PlansConfiguration.get($page.data.user.plan)?.monthly_limit ?? 0);
+	let totalMonthlyScansCount = $state<number>($page.data.totalMonthlyScans);
+	let limitReachedDialogOpened = $state(false);
 
 	title.set('Scans');
 
@@ -73,13 +77,18 @@
 			if (form.valid) {
 				setScanDialogOpenState(false);
 				const newScan = buildScanResultObjectFromParsedRawData(form.data);
-				scans = [newScan, ...scans];
-				if (!scansSettings?.start_scans_immediately) { 
-					createScanObject(newScan);
-					return;
+				const proceed = () => {
+					scans = [newScan, ...scans];
+					if (!scansSettings?.start_scans_immediately) { 
+						createScanObject(newScan);
+						return;
+					}
+					newScan.status = 'in_progress';
+					worker?.postMessage({task: 'scan', items: [newScan]});
 				}
-				newScan.status = 'in_progress';
-				worker?.postMessage({task: 'scan', items: [newScan]});
+				handleMonthlyLimitation(1, {
+					proceed
+				});
 			}
 		},
 		onError: () => {
@@ -108,18 +117,23 @@
 						toast.error('This file has invalid structure or it is empty, no scans to execute.');
 						return; 
 					}
-					if (parsedData.length > newScans.length) {
-						toast.info(`${parsedData.length - newScans.length} items are invalid and has been filtered out.`);
+					const proceed = () => {
+						if (parsedData.length > newScans.length) {
+							toast.info(`${parsedData.length - newScans.length} items are invalid and has been filtered out.`);
+						}
+						scans = [...newScans, ...scans];
+						if (!scansSettings?.start_scans_immediately) {
+							newScans.forEach((scanRes) => {
+								createScanObject(scanRes);
+							});
+							return;
+						}
+						newScans.forEach(scan => scan.status = 'queued');
+						worker?.postMessage({task: 'scan', items: newScans});
 					}
-					scans = [...newScans, ...scans];
-					if (!scansSettings?.start_scans_immediately) {
-						newScans.forEach((scanRes) => {
-							createScanObject(scanRes);
-						});
-						return;
-					}
-					newScans.forEach(scan => scan.status = 'queued');
-					worker?.postMessage({task: 'scan', items: newScans});
+					handleMonthlyLimitation(newScans.length, {
+						proceed
+					});
 				})
 			})
 			.finally(() => {
@@ -183,6 +197,15 @@
 		if (e.type === 'navigate') {
 			goto(`scans/${e.data.id}`);
 		}
+	}
+
+	function handleMonthlyLimitation(amountToAdd: number, options: {proceed: () => void}) {
+		console.log(totalMonthlyScansCount, amountToAdd, scansMonthlyLimit)
+		if ((totalMonthlyScansCount + amountToAdd) > scansMonthlyLimit) { 
+			limitReachedDialogOpened = true;
+			return;
+		}
+		options.proceed();
 	}
 
 </script>
@@ -318,6 +341,20 @@
 				{/if}
 				<span>DELETE</span>
 			</AlertDialog.Action>
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>
+
+<AlertDialog.Root bind:open={limitReachedDialogOpened}>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title>Beware! You cannot exceed your monthly limit</AlertDialog.Title>
+			<AlertDialog.Description>
+				Please reduce the amount of scans to meet the monthly limit set by your current plan.
+			</AlertDialog.Description>
+		</AlertDialog.Header>
+		<AlertDialog.Footer>
+			<AlertDialog.Action onclick={() => limitReachedDialogOpened = false}>I understand</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>
