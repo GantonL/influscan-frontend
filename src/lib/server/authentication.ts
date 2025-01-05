@@ -1,6 +1,8 @@
 import type { Handle, RequestEvent } from '@sveltejs/kit';
-import { verifyToken } from '@clerk/backend';
+import { verifyToken, createClerkClient } from '@clerk/backend';
 import type { User } from '$lib/models/user';
+import { getUser } from './database/users';
+import type { Plan } from '$lib/enums/plan';
 
 type ClerkErrorWithReason = {
 	reason?: string
@@ -44,6 +46,7 @@ export default function handleClerk(
             console.log('[Clerk SvelteKit] Session verified successfully.');
           }
 					event.locals.session = session;
+					await handleUserMetadata(event.locals.session, {secretKey})
 				} else {
           if (debug) {
             console.warn('[Clerk SvelteKit] Session verification returned no session.');
@@ -87,11 +90,30 @@ const verifySession = async (sessionToken: string, {secretKey, jwtKey, authorize
 			secretKey,
 			authorizedParties,
 			jwtKey,
-		})
+		});
+		if (!claims.user_id) { return; }
 		return {
 			id: claims.user_id as string,
 			name: claims.user_name as string,
+			plan: claims.plan as Plan,
 		}
 	}
 	return;
 }
+
+const handleUserMetadata = async (session: User, options: {secretKey: string; jwtKey?: string}) => {
+	if (!session.id || session.plan) { return; }
+	const client = createClerkClient({
+		secretKey: options.secretKey,
+		jwtKey: options.jwtKey,
+	});
+	const dbUser = await getUser(session.id);
+	if (!dbUser) { return; }
+	await client.users.updateUserMetadata(session.id, 
+	{
+		publicMetadata: {
+			plan: dbUser.plan
+		}
+	});
+	session.plan = dbUser.plan;
+}  
