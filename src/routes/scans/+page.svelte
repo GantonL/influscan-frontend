@@ -9,7 +9,7 @@
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
 	import { HelpCircle, LoaderCircle } from "lucide-svelte";
-	import { buildScanResultObjectFromParsedRawData, createScanObject, deleteScanObject, rescan, scan, type OmittedScanResult } from "./utilities";
+	import { buildScanResultObjectFromParsedRawData, createScanObject, deleteScanObject, type OmittedScanResult } from "./utilities";
 	import * as Form from "$lib/components/ui/form";
 	import { superForm } from "sveltekit-superforms";
 	import { zodClient } from "sveltekit-superforms/adapters";
@@ -200,7 +200,6 @@
 	}
 
 	function handleMonthlyLimitation(amountToAdd: number, options: {proceed: () => void}) {
-		console.log(totalMonthlyScansCount, amountToAdd, scansMonthlyLimit)
 		if ((totalMonthlyScansCount + amountToAdd) > scansMonthlyLimit) { 
 			limitReachedDialogOpened = true;
 			return;
@@ -320,7 +319,6 @@
 		</div>
   </Dialog.Content>
 </Dialog.Root>
-
 
 <AlertDialog.Root bind:open={deleteScansDialogOpened}>
 	<AlertDialog.Content>

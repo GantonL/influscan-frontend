@@ -5,3 +5,7 @@ export interface User {
   name?: string;
   plan?: Plan;
 }
+
+export interface UserStats {
+  total_monthly_scans?: number;
+}
