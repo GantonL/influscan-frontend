@@ -5,7 +5,11 @@
 	import SignedOut from "clerk-sveltekit/client/SignedOut.svelte";
 	import FunnyAvatars from "./funny-avatars.svelte";
 	import Plans from "./plans.svelte";
+	import type { User } from "$lib/models/user";
+	import { page } from "$app/stores";
+	import { Plan } from "$lib/enums/plan";
   title.clear();
+  const user: User | undefined = $state<User | undefined>($page.data.user); 
 </script>
 <div class="flex flex-row flex-wrap gap-8">
   <div class="flex flex-col gap-6 align-start max-w-[400px]">
@@ -23,4 +27,6 @@
   </div>
   <FunnyAvatars />
 </div>
+{#if (!user?.plan || user?.plan === Plan.None )}
 <Plans />
+{/if}

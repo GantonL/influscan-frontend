@@ -34,6 +34,7 @@
   }
 
   function changeScansSettings(path: keyof Omit<ScansSettings, 'user_id'>, value: any) {
+    if (scansSettings[path] === value) { return; }
     setInProgress(path, true);
     const updateObject: Partial<Omit<ScansSettings, 'user_id'>> = {};
     updateObject[path] = value;
