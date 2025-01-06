@@ -6,7 +6,12 @@
 	import Send from "lucide-svelte/icons/send";
 	import { page } from "$app/stores";
 	import { onMount } from "svelte";
+	import { Plan } from "$lib/enums/plan";
+	import { Button } from "../ui/button";
+	import { PlansDisplayConfiguartion } from "$lib/configurations/plans";
   
+  let { plan }: {plan?: Plan} = $props();
+
   const groups = [
     {
       label: "Application",
@@ -83,4 +88,21 @@
     </Sidebar.Group>
     {/each}
   </Sidebar.Content>
+  <Sidebar.Footer>
+    <Sidebar.Menu>
+      <Sidebar.MenuItem>
+        <Sidebar.MenuButton>
+          {#snippet child({ props })}
+            {@const planConfig = PlansDisplayConfiguartion[plan ?? Plan.None]}
+            <a href="/plan" class="group">
+              <Button variant="outline" {...props} class={planConfig.class}>
+                <planConfig.icon size=20 class={planConfig.iconClass} />
+                <span>{planConfig.name} plan</span>
+              </Button>
+            </a>
+          {/snippet}
+        </Sidebar.MenuButton>
+      </Sidebar.MenuItem>
+    </Sidebar.Menu>
+  </Sidebar.Footer>
  </Sidebar.Root>
