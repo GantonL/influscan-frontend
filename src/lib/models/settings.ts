@@ -1,3 +1,4 @@
+import type { Plan } from "$lib/enums/plan";
 import type { ComboboxConfiguration } from "./combobox";
 
 export interface ScansSettings {
@@ -19,7 +20,8 @@ interface SettingsItemConfiguration<T> {
   title: string;
   description: string;
   path: keyof T;
-  action: SettingsBooleanAction | SettingsChoisesAction
+  action: SettingsBooleanAction | SettingsChoisesAction;
+  plans: Plan[];
 }
 
 export interface SettingsConfiguration<T> {

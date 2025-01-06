@@ -8,10 +8,25 @@
 	import { ScansSettingsConfigurations } from "./configurations";
 	import { updateScansSettings } from "./utilities";
 	import Combobox from "$lib/components/combobox/combobox.svelte";
+	import type { User } from "$lib/models/user";
+	import { Plan } from "$lib/enums/plan";
   title.set('Settings');
   const scansSettings: Omit<ScansSettings, 'user_id'> = $state($page.data.scansSettings);
+  const user: User = $state($page.data.user);
   const actionsInProgressStates: Record<string, boolean> = $state({});
   let submmitionInProgress = $state(false);
+  let configurations = ScansSettingsConfigurations;
+  
+  $effect.pre(() => {
+    configurations.items = configurations.items.filter(item => item.plans.includes(user.plan ?? Plan.None));
+    configurations.items.forEach(item => {
+      if (item.action?.type === 'choises') {
+        item.action.options.forEach((option) => {
+          option.disabledIfArgs = user;
+        })
+      }
+    })
+  });
 
   function setInProgress(path: keyof Omit<ScansSettings, 'user_id'>, value: boolean) {
     submmitionInProgress = value;
@@ -33,8 +48,8 @@
 
 </script>
 {#if scansSettings}
-  <h1 class="text-4xl">{ScansSettingsConfigurations.title}</h1>
-  {#each ScansSettingsConfigurations.items as item}
+  <h1 class="text-4xl">{configurations.title}</h1>
+  {#each configurations.items as item}
   <Card.Root class="w-full">
     <Card.Header>
       <Card.Title>{item.title}</Card.Title>

@@ -1,4 +1,6 @@
+import { Plan } from "$lib/enums/plan";
 import type { ScansSettings, SettingsConfiguration } from "$lib/models/settings";
+import type { User } from "$lib/models/user";
 
 export const ScansSettingsConfigurations: SettingsConfiguration<Omit<ScansSettings, 'user_id'>> = {
   title: 'Scans',
@@ -9,7 +11,8 @@ export const ScansSettingsConfigurations: SettingsConfiguration<Omit<ScansSettin
       path: 'start_scans_immediately',
       action: {
         type: 'boolean'
-      }
+      },
+      plans: [Plan.Lite, Plan.Plus, Plan.Pro],
     },
     {
       title: 'CSV Parser',
@@ -21,15 +24,18 @@ export const ScansSettingsConfigurations: SettingsConfiguration<Omit<ScansSettin
           {
             label: 'Strict',
             value: 'strict',
-            description: 'Parse with a strict policy, using predefined required fields.'
+            description: 'Parse with a strict policy, using predefined required fields.',
+            disabledIf: (user) =>  ![Plan.Lite, Plan.Plus, Plan.Pro].includes((user as User)?.plan ?? Plan.None)
           },
           {
             label: 'Dynamic',
             value: 'dynamic',
-            description: 'Let us figure out the fields we need.'
+            description: 'Let us figure out the fields we need.',
+            disabledIf: (user) =>  ![Plan.Plus, Plan.Pro].includes((user as User)?.plan ?? Plan.None)
           }
         ]
-      }
+      },
+      plans: [Plan.Lite, Plan.Plus, Plan.Pro],
     }
   ]
 }

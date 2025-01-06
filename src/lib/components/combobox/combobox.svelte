@@ -72,6 +72,7 @@
       {#each configuration.options as option}
        <Command.Item
         value={option.value}
+        disabled={option.disabledIf && option.disabledIf(option.disabledIfArgs)}
         onSelect={() => {
          value = option.value;
          event({type: configuration.event ?? 'option_selecetd', data: value})

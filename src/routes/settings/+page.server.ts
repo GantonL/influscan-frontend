@@ -3,12 +3,11 @@ import { getScansSettings } from '$lib/server/database/scans-settings';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-  if (!locals?.session?.id) {
-    return;
-  }
-  const userId = locals.session.id;
-  const scansSettings: Omit<ScansSettings, 'user_id'> | undefined = await getScansSettings(userId); 
+  const user = locals.session;
+  if (!user?.id) {return;}
+  const scansSettings: Omit<ScansSettings, 'user_id'> | undefined = await getScansSettings(user.id); 
   return {
     scansSettings,
+    user,
   }
 }
