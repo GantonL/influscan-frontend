@@ -1,6 +1,7 @@
 import { Plan, PlanFeatures } from "$lib/enums/plan";
+import type { MenuActionItem } from "$lib/models/menu";
 import type { PlanConfiguration, PlanDisplayConfigration } from "$lib/models/plan";
-import { CircleOff, Heart, Spade, Sparkle } from "lucide-svelte";
+import { ArrowDownFromLine, ArrowUpFromLine, CircleOff, CircleSlash2, Heart, Spade, Sparkle } from "lucide-svelte";
 
 export const PlansConfiguration = new Map<Plan, PlanConfiguration>([
   [Plan.None, { monthly_limit: 0, price: 0 }],
@@ -9,12 +10,32 @@ export const PlansConfiguration = new Map<Plan, PlanConfiguration>([
   [Plan.Pro,  { monthly_limit: 10000, price: 250 }],
 ]);
 
+const upgradeAction: MenuActionItem = {
+  title: 'Upgrade',
+  icon: ArrowUpFromLine,
+  event: 'upgrade',
+  variant: 'default',
+};
+const downgradeAction: MenuActionItem = {
+  title: 'Downgrade',
+  icon: ArrowDownFromLine,
+  event: 'downgrade',
+  variant: 'secondary'
+};
+const revokeAction: MenuActionItem = {
+  title: 'Revoke',
+  icon: CircleSlash2,
+  event: 'revoke',
+  variant: 'destructive',
+};
+
 export const PlansDisplayConfiguartion: Record<Plan, PlanDisplayConfigration> = {
   [Plan.None]: {
     name: 'None',
     icon: CircleOff,
-    price: PlansConfiguration.get(Plan.Lite)!.price,
+    price: PlansConfiguration.get(Plan.None)!.price,
     features: [],
+    actions: [upgradeAction],
   },
   [Plan.Lite]: {
     name: 'Lite',
@@ -30,6 +51,10 @@ export const PlansDisplayConfiguartion: Record<Plan, PlanDisplayConfigration> = 
     excludedFeatures: [
       PlanFeatures.APIKey,
       PlanFeatures.Integrations,
+    ],
+    actions: [
+      upgradeAction,
+      revokeAction,
     ]
   },
   [Plan.Plus]: {
@@ -46,6 +71,11 @@ export const PlansDisplayConfiguartion: Record<Plan, PlanDisplayConfigration> = 
       PlanFeatures.Integrations,
     ],
     class: 'border-2 border-primary',
+    actions: [
+      upgradeAction,
+      downgradeAction,
+      revokeAction,
+    ],
   },
   [Plan.Pro]: {
     name: 'Pro',
@@ -59,6 +89,10 @@ export const PlansDisplayConfiguartion: Record<Plan, PlanDisplayConfigration> = 
       PlanFeatures.DynamicCSVParser,
       PlanFeatures.APIKey,
       PlanFeatures.Integrations,
+    ],
+    actions: [
+      downgradeAction,
+      revokeAction,
     ],
   },
 };

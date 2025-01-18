@@ -5,7 +5,8 @@ export interface MenuActionItem<T = void> {
   event: string;
   icon: ConstructorOfATypedSvelteComponent;
   class?: string;
-  disableIf?: (data: T) => boolean
+  disableIf?: (data: T) => boolean;
+  variant?: ButtonVariant;
 }
 
 export interface MenuActionItemGroup<T = void> {

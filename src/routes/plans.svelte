@@ -4,7 +4,7 @@
 	import { PlansDisplayConfiguartion } from "$lib/configurations/plans";
 	import { Plan } from "$lib/enums/plan";
 	import type { PlanDisplayConfigration } from "$lib/models/plan";
-	import { Check, Heart, Spade, Sparkle, X } from "lucide-svelte";
+	import { Check, X } from "lucide-svelte";
 
   const plans: PlanDisplayConfigration[] = [
     PlansDisplayConfiguartion[Plan.Lite], 

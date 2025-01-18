@@ -9,7 +9,8 @@ export const handle: Handle = sequence(
 		protectedPaths: [
 			'/scans',
 			'/api',
-			'/settings'
+			'/settings',
+			'/plan',
 		],
 		signInUrl: '/sign-in',
 		authorizedParties: ['http://localhost:5173', 'https://influscan.pages.dev'],

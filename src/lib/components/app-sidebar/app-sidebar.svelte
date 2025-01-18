@@ -94,8 +94,8 @@
         <Sidebar.MenuButton>
           {#snippet child({ props })}
             {@const planConfig = PlansDisplayConfiguartion[plan ?? Plan.None]}
-            <a href="/plan" class="group">
-              <Button variant="outline" {...props} class={planConfig.class}>
+            <a href="/plan">
+              <Button variant="outline" {...props} class={'w-full ' + planConfig.class}>
                 <planConfig.icon size=20 class={planConfig.iconClass} />
                 <span>{planConfig.name} plan</span>
               </Button>
