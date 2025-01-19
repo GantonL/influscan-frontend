@@ -5,13 +5,60 @@
 	import * as Card from "$lib/components/ui/card";
 	import type { User } from "$lib/models/user";
 	import { Plan } from "$lib/enums/plan";
-	import { Check, X } from "lucide-svelte";
+	import { Check, LoaderCircle, X } from "lucide-svelte";
 	import { PlansDisplayConfiguartion } from "$lib/configurations/plans";
 	import Button from "$lib/components/ui/button/button.svelte";
+	import * as AlertDialog from "$lib/components/ui/alert-dialog";
+	import { toast } from "svelte-sonner";
+	import { goto } from "$app/navigation";
   title.set('Plan');
 
   const user: User | undefined = $state<User | undefined>($page.data.user);
   const plan: PlanDisplayConfigration = PlansDisplayConfiguartion[user?.plan ?? Plan.None];
+  let upgradeDialogOpenedState = $state(false);
+  let downgradeDialogOpenedState = $state(false);
+  let revokeDialogOpenedState = $state(false);
+  let updatePlanInProgress = $state(false);
+
+  function onPlanAction(event: string) {
+    switch (event) {
+      case 'upgrade':
+        upgradeDialogOpenedState = true;
+        break;
+      case 'downgrade':
+        downgradeDialogOpenedState = true;
+        break;
+      case 'revoke':
+        revokeDialogOpenedState = true;
+        break;
+    }
+  }
+
+  function onRevokePlan() {
+    updatePlanInProgress = true;
+    const body = new FormData();
+    body.append('plan', Plan.None);
+    const onError = () => {
+      updatePlanInProgress = false;
+      revokeDialogOpenedState = false;
+      toast.error('Failed to update user plan');
+    }
+    fetch('/plan', {method: 'PUT', body})
+      .then(res => {
+        res.json().then(res => {
+          if (res) {
+            goto('/').finally(() => {
+              location.reload();
+            })
+          } else {
+            onError();
+          }
+        })
+        .catch(onError);
+      })
+      .catch(onError);
+  }
+
 </script>
 <Card.Root class="{plan.class} w-full">
   <Card.Header class="flex flex-col">
@@ -36,10 +83,37 @@
   </Card.Content>
   <Card.Footer class="flex flex-row flex-wrap gap-2 items-center">
     {#each plan.actions ?? [] as action}
-    <Button class="flex flex-row gap-2 items-center" variant={action.variant}>
+    <Button class="flex flex-row gap-2 items-center" 
+      variant={action.variant} 
+      onclick={() => onPlanAction(action.event)}
+      disabled={updatePlanInProgress}>
       <action.icon size=12/>
       <span>{action.title}</span>
     </Button>
     {/each}
   </Card.Footer>
 </Card.Root>
+
+<AlertDialog.Root bind:open={revokeDialogOpenedState}>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title>Are you sure you want to revoke your user plan?</AlertDialog.Title>
+			<AlertDialog.Description>
+				You will no longer be able to execute new scans.
+			</AlertDialog.Description>
+		</AlertDialog.Header>
+		<AlertDialog.Footer>
+			<AlertDialog.Cancel disabled={updatePlanInProgress}>CANCEL</AlertDialog.Cancel>
+			<AlertDialog.Action 
+        onclick={onRevokePlan}
+        disabled={updatePlanInProgress}>
+        <div class="flex flex-row gap-2 items-center">
+          {#if updatePlanInProgress}
+          <LoaderCircle class="animate-spin" size=14/>
+          {/if}
+          <span>Confirm</span>
+        </div>
+      </AlertDialog.Action>
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>

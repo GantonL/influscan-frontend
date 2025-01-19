@@ -1,4 +1,5 @@
 import { PlansConfiguration } from "$lib/configurations/plans";
+import type { Plan } from "$lib/enums/plan";
 import type { User } from "$lib/models/user";
 import { db, Tables } from ".";
 
@@ -47,3 +48,14 @@ export const planMonthlyLimit = async (user_id: string): Promise<number> => {
   }
   return PlansConfiguration.get(data.plan)?.monthly_limit ?? 0;
 }
+
+export const updatePlan = async (user_id: string, plan: Plan): Promise<boolean> => {
+  const { error } = await db.from(Tables.Users)
+    .update({plan})
+    .eq('id', user_id);
+  if (error) {
+    console.error('[updatePlan]', error);
+    return false;
+  }
+  return true;
+} 
