@@ -18,8 +18,10 @@
   let configurations = ScansSettingsConfigurations;
   
   $effect.pre(() => {
-    configurations.items = configurations.items.filter(item => item.plans.includes(user.plan ?? Plan.None));
     configurations.items.forEach(item => {
+      const isInPlan = item.plans.includes(user.plan ?? Plan.None);
+      item.disabled = !isInPlan;
+      item.requiresUpgrade = !isInPlan;
       if (item.action?.type === 'choises') {
         item.action.options.forEach((option) => {
           option.disabledIfArgs = user;
@@ -59,10 +61,10 @@
     {#if item.action}
       <Card.Footer class="mt-2 w-full">
         {#if item.action.type === 'boolean'}
-          <div class="flex flex-row justify-start w-full">
+          <div class="flex flex-row items-center justify-start w-full">
             <Button 
               onclick={() => changeScansSettings(item.path, !scansSettings[item.path])}
-              disabled={submmitionInProgress || actionsInProgressStates[item.path]}
+              disabled={submmitionInProgress || actionsInProgressStates[item.path] || item.disabled}
               variant={scansSettings[item.path] ? 'default' : 'secondary'}
               class="flex flex-row items-center gap-2 min-w-20">
               {#if actionsInProgressStates[item.path]}
@@ -71,6 +73,9 @@
                 {scansSettings[item.path] ? 'Enabled' : 'Disabled'}
               {/if}
             </Button>
+            {#if item.requiresUpgrade}
+            <Button variant='link'><a href="/plan" class="italic text-muted-foreground">*Upgrade plan to enbable</a></Button>
+            {/if}
           </div>
         {:else if item.action.type === 'choises'}
           <Combobox 

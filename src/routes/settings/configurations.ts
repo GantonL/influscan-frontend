@@ -25,17 +25,26 @@ export const ScansSettingsConfigurations: SettingsConfiguration<Omit<ScansSettin
             label: 'Strict',
             value: 'strict',
             description: 'Parse with a strict policy, using predefined required fields.',
-            disabledIf: (user) =>  ![Plan.Lite, Plan.Plus, Plan.Pro].includes((user as User)?.plan ?? Plan.None)
+            disabledIf: (user) => ![Plan.Lite, Plan.Plus, Plan.Pro].includes((user as User)?.plan ?? Plan.None)
           },
           {
             label: 'Dynamic',
             value: 'dynamic',
             description: 'Let us figure out the fields we need.',
-            disabledIf: (user) =>  ![Plan.Plus, Plan.Pro].includes((user as User)?.plan ?? Plan.None)
+            disabledIf: (user) => ![Plan.Plus, Plan.Pro].includes((user as User)?.plan ?? Plan.None)
           }
         ]
       },
       plans: [Plan.Lite, Plan.Plus, Plan.Pro],
+    },
+    {
+      title: 'Narrowed analysis',
+      description: 'Define analysis narrowing rules to meet the needs of your business and reduce noise.',
+      path: 'narrowed_analysis',
+      action: {
+        type: 'boolean',
+      },
+      plans: [Plan.Plus, Plan.Pro],
     }
   ]
 }
