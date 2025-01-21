@@ -11,23 +11,31 @@ export interface ScansSettings {
   prioritized_niche?: string;
 }
 
-interface SettingsBooleanAction {
-  type: 'boolean',
+export interface SettingsTextAction {
+  type: 'text',
+  placeholder?: string;
+  title?: string;
+  description?: string;
 }
 
-interface SettingsChoisesAction {
+export interface SettingsBooleanAction {
+  type: 'boolean';
+}
+
+export interface SettingsChoisesAction {
   type: 'choises',
   options: ComboboxConfiguration['options'];
 }
 
-interface SettingsItemConfiguration<T> {
+export interface SettingsItemConfiguration<T> {
   title: string;
   description: string;
   path: keyof T;
-  action: SettingsBooleanAction | SettingsChoisesAction;
-  plans: Plan[];
+  action: SettingsBooleanAction | SettingsChoisesAction | SettingsTextAction;
+  plans?: Plan[];
   disabled?: boolean;
   requiresUpgrade?: boolean;
+  children?: SettingsItemConfiguration<T>[];
 }
 
 export interface SettingsConfiguration<T> {

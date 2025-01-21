@@ -45,6 +45,35 @@ export const ScansSettingsConfigurations: SettingsConfiguration<Omit<ScansSettin
         type: 'boolean',
       },
       plans: [Plan.Plus, Plan.Pro],
+      children: [
+        {
+          title: 'Prioritized platform',
+          description: 'The main platform in which you consider an individual as an influencer',
+          path: 'prioritized_platform',
+          action: {
+            type: 'text',
+            placeholder: 'Instagram, Facebook, Linkedin, etc.'
+          },
+        },
+        {
+          title: 'Prioritized domain',
+          description: 'The main domain in which you consider an individual as an influencer',
+          path: 'prioritized_domain',
+          action: {
+            type: 'text',
+            placeholder: 'Sports, fashion, music, etc.'
+          },
+        },
+        {
+          title: 'Prioritized niche',
+          description: 'The specific niche in which you consider an individual as an influencer',
+          path: 'prioritized_niche',
+          action: {
+            type: 'text',
+            placeholder: 'Hockey, jewlery, Guitar player, etc.'
+          },
+        },
+      ]
     }
   ]
 }
