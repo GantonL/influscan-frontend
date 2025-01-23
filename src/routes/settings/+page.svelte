@@ -104,7 +104,7 @@
     <Label for={item.title}>{item.title}</Label>
     <Input type="text" id={item.title} 
       onchange={(e: Event) => changeScansSettings(item.path, e.target.value)}
-      bind:value={scansSettings[item.path]}
+      value={scansSettings[item.path]}
       placeholder={(item.action as SettingsTextAction).placeholder} 
       disabled={submmitionInProgress || actionsInProgressStates[item.path] || item.disabled}/>
     <p class="text-muted-foreground text-sm italic">{item.description}</p>
