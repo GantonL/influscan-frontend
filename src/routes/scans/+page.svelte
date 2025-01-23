@@ -84,7 +84,7 @@
 						return;
 					}
 					newScan.status = 'in_progress';
-					worker?.postMessage({task: 'scan', items: [newScan]});
+					worker?.postMessage({task: 'scan', items: [newScan], settings: $state.snapshot(scansSettings)});
 				}
 				handleMonthlyLimitation(1, {
 					proceed
@@ -129,7 +129,7 @@
 							return;
 						}
 						newScans.forEach(scan => scan.status = 'queued');
-						worker?.postMessage({task: 'scan', items: newScans});
+						worker?.postMessage({task: 'scan', items: newScans, settings: $state.snapshot(scansSettings)});
 					}
 					handleMonthlyLimitation(newScans.length, {
 						proceed
@@ -158,7 +158,7 @@
 					toast.info(`${idsOfCandidates.length - toRescan.length} items are already in progress or queued and has been filtered out.`);
 				}
 				toRescan.forEach(scan => scan.status = 'queued');
-				worker?.postMessage({task: 'rescan', items: e.data});
+				worker?.postMessage({task: 'rescan', items: e.data, settings: $state.snapshot(scansSettings)});
 				table?.resetSelection && table?.resetSelection();
 				break;
 			default:

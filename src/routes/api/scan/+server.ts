@@ -3,6 +3,7 @@ import { analyze, createScanObject, search, updateScanObject } from "../../scans
 import { type ScanResult } from '$lib/models/scan';
 import { totalMonthlyScansCount, updateTotalMonthlyScanCount as updateTotalMonthlyScanCount } from "$lib/server/database/scans";
 import { planMonthlyLimit } from "$lib/server/database/users";
+import type { ScansSettings } from "$lib/models/settings";
 
 export const POST: RequestHandler = async ({request, locals, fetch}) => {
   const data = await request.formData();
@@ -19,7 +20,12 @@ export const POST: RequestHandler = async ({request, locals, fetch}) => {
   if (!createScanObjectRes) {
     error(500, 'Failed to create scan object');
   }
-  const { success, scanResult } = await searchAndAnalyze(userId, parsedScanData, response, { fetch });
+  const scanSettings = data.get('settings')?.toString();
+  let settings: ScansSettings | undefined = undefined;
+  if (scanSettings) {
+    settings = JSON.parse(scanSettings);
+  }
+  const { success, scanResult } = await searchAndAnalyze(userId, parsedScanData, response, { fetch, settings });
   response.success = success;
   response.scanResult = scanResult;
   return json(response);
@@ -36,7 +42,12 @@ export const PUT: RequestHandler = async ({request, locals, fetch}) => {
   if (!isAllowed) {
     error(401, 'Scan limit reached');
   }
-  const { success, scanResult } = await searchAndAnalyze(userId, parsedScanData, response, { fetch });
+  const scanSettings = data.get('settings')?.toString();
+  let settings: ScansSettings | undefined = undefined;
+  if (scanSettings) {
+    settings = JSON.parse(scanSettings);
+  }
+  const { success, scanResult } = await searchAndAnalyze(userId, parsedScanData, response, { fetch, settings });
   response.success = success;
   response.scanResult = scanResult;
   return json(response);
@@ -54,7 +65,7 @@ const handleFailedScan = async (scan: ScanResult, response: {success: boolean, s
   return response;
 }
 
-const searchAndAnalyze = async (user_id: string, scan: ScanResult, response: {success: boolean, scanResult?: ScanResult}, options?: { fetch?: RequestEvent['fetch'] }): Promise<{success: boolean, scanResult?: ScanResult}> => {
+const searchAndAnalyze = async (user_id: string, scan: ScanResult, response: {success: boolean, scanResult?: ScanResult}, options?: { fetch?: RequestEvent['fetch'], settings?: ScansSettings }): Promise<{success: boolean, scanResult?: ScanResult}> => {
   const searchResults = await search(scan.details, options);
   if (searchResults.error) {
     return handleFailedScan(scan, response, options);

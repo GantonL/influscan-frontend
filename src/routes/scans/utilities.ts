@@ -1,5 +1,6 @@
 import type { AnalysisResult, ScanResult } from "$lib/models/scan";
 import type { GoogleCustomSearchEngineResult } from "$lib/models/search";
+import type { ScansSettings } from "$lib/models/settings";
 import type { RequestEvent } from "./$types";
 
 export type OmittedScanResult = Omit<ScanResult, 'user_id' | 'created_at'>; 
@@ -17,10 +18,13 @@ export const buildScanResultObjectFromParsedRawData = (rawData: Record<string, s
   }
 }
 
-export const scan = async (data: OmittedScanResult, options?: {fetch?: RequestEvent['fetch']}): Promise<{success: boolean, scanResult?: ScanResult, message?: string}> => {
+export const scan = async (data: OmittedScanResult, options?: {fetch?: RequestEvent['fetch'], settings?: ScansSettings}): Promise<{success: boolean, scanResult?: ScanResult, message?: string}> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('data', JSON.stringify(data));
+    if (options?.settings) {
+      body.append('settings', JSON.stringify(options?.settings));
+    }
     const request = options?.fetch ?? fetch;
     request('/api/scan', {method: 'POST', body})
       .then((res) => {
@@ -32,10 +36,13 @@ export const scan = async (data: OmittedScanResult, options?: {fetch?: RequestEv
   });
 }
 
-export const rescan = async (data: OmittedScanResult, options?: {fetch?: RequestEvent['fetch']}): Promise<{success: boolean, scanResult?: ScanResult, message?: string}> => {
+export const rescan = async (data: OmittedScanResult, options?: {fetch?: RequestEvent['fetch'], settings?: ScansSettings}): Promise<{success: boolean, scanResult?: ScanResult, message?: string}> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('data', JSON.stringify(data));
+    if (options?.settings) {
+      body.append('settings', JSON.stringify(options?.settings));
+    }
     const request = options?.fetch ?? fetch;
     request('/api/scan', {method: 'PUT', body})
       .then((res) => {
@@ -108,11 +115,14 @@ export const search = async (candidateData: ScanResult['details'], options?: {fe
   });
 }
 
-export const analyze = async (candidateDetails: string, searchResults: Pick<GoogleCustomSearchEngineResult, 'title' | 'snippet' | 'link'>[], options?: {fetch?: RequestEvent['fetch']}): Promise<AnalysisResult> => {
+export const analyze = async (candidateDetails: string, searchResults: Pick<GoogleCustomSearchEngineResult, 'title' | 'snippet' | 'link'>[], options?: {fetch?: RequestEvent['fetch'], settings?: ScansSettings}): Promise<AnalysisResult> => {
   return new Promise((resolve, reject) => {
     const body = new FormData();
     body.append('details', JSON.stringify(candidateDetails));
     body.append('results', JSON.stringify(searchResults));
+    if (options?.settings) {
+      body.append('settings', JSON.stringify(options.settings));
+    }
     const request = options?.fetch ?? fetch;
     request('/api/analyze', {method: 'POST', body})
       .then((res) => {

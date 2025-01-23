@@ -1,20 +1,23 @@
+import type { ScansSettings } from "$lib/models/settings";
 import { rescan, scan, type OmittedScanResult } from "./utilities";
 
 self.onmessage = (e) => {
+  const items = e.data.items;
+  const settings = e.data.settings;
   switch (e.data.task) {
     case 'scan':
-      batchScan(e.data.items);
+      batchScan(items, settings);
       break;
     case 'rescan':
-      batchRescan(e.data.items);
+      batchRescan(items, settings);
       break;
   }
 };
 
-async function batchScan(items: OmittedScanResult[]) {
+async function batchScan(items: OmittedScanResult[], settings: ScansSettings) {
   for await (const item of items) {
     postMessage({scanResult: {...item, status: 'in_progress'}});
-    const result = await scan(item)
+    const result = await scan(item, {settings})
     .catch(() => {
 			return {
 				success: false,
@@ -30,10 +33,10 @@ async function batchScan(items: OmittedScanResult[]) {
   }
 }
 
-async function batchRescan(items: OmittedScanResult[]) {
+async function batchRescan(items: OmittedScanResult[], settings: ScansSettings) {
   for await (const item of items) {
     postMessage({scanResult: {...item, status: 'in_progress'}});
-    const result = await rescan(item)
+    const result = await rescan(item, {settings})
     .catch(() => {
 			return {
 				success: false,
