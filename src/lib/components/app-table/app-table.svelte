@@ -35,7 +35,7 @@
     addData: () => void, 
     bulkActions?: (e: {type: string; data: any}) => void, 
     rowClick?: (e: {type: string; data: any}) => void 
-    pageSizeChanged?: (e: {type: string; data: any}) => void 
+    pageSizeChanged?: (newPageSize: number) => void 
   } = $props();
 
   let pageSize = $state(configuration?.pageSize ?? 10);
@@ -116,10 +116,9 @@
   }
 
   function onPageSizeChanged(e: {type: string, data: any}) {
-    pageSizeChanged && pageSizeChanged(e);
-    table.setPageSize(() => {
-      return Number(e.data)
-    })
+    const newPageSize = Number(e.data);
+    pageSizeChanged && pageSizeChanged(newPageSize);
+    table.setPageSize(newPageSize);
   }
  </script>
   

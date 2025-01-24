@@ -14,7 +14,7 @@
 	import { superForm } from "sveltekit-superforms";
 	import { zodClient } from "sveltekit-superforms/adapters";
 	import { Input } from "$lib/components/ui/input";
-	import { goto } from "$app/navigation";
+	import { goto, replaceState } from "$app/navigation";
 	import { title } from "$lib/stores";
 	import { toast } from "svelte-sonner";
 	import type { ScansSettings } from "$lib/models/settings";
@@ -37,6 +37,10 @@
 	let limitReachedDialogOpened = $state(false);
 
 	title.set('Scans');
+
+	$effect.pre(() => {
+		tableConfiguration.pageSize = Number($page.url.searchParams.get('pageSize') ?? $page.data.viewSettings?.pageSize);
+	});
 
 	onMount(() => {
 		initializeWorker();
@@ -207,13 +211,19 @@
 		options.proceed();
 	}
 
+	function onPageSizeChanged(newPageSize: number) {
+		$page.url.searchParams.set('pageSize', String(newPageSize));
+		replaceState($page.url, $page.state);
+	}
+
 </script>
 <AppTable { columns } data={scans}
 	bind:this={table}
 	configuration={tableConfiguration} 
 	addData={() => setScanDialogOpenState(true)} 
 	bulkActions={onBulkActions}
-	rowClick={onRowClick}/>
+	rowClick={onRowClick}
+	pageSizeChanged={onPageSizeChanged}/>
 
 <Dialog.Root open={addScanDialogOpened} controlledOpen={true} onOpenChange={setScanDialogOpenState}>
   <Dialog.Content>
