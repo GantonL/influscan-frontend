@@ -43,7 +43,7 @@
       <Button
         disabled={disabled || inProgress}
         variant="outline"
-        class="w-[200px] justify-between"
+        class="w-fit"
         {...props}
         role="combobox"
         aria-expanded={open}

@@ -11,5 +11,5 @@ export interface ComboboxConfiguration {
   search?: {
     placeholder?: string;
     emptyState?: string;
-  }
+  },
 }

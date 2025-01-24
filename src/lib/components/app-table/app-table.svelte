@@ -14,6 +14,8 @@
 	import EmptyResults from "../empty-results/empty-results.svelte";
 	import { type TableConfiguration } from "$lib/models/table";
 	import Menu from "../menu/menu.svelte";
+	import Combobox from "../combobox/combobox.svelte";
+	import { pageSizeOptionsConfiguration } from "./defaults";
 
   type DataTableProps<TData, TValue> = {
    columns: ColumnDef<TData, TValue>[];
@@ -21,9 +23,23 @@
    configuration?: TableConfiguration<TData>;
   };
   
-  let { data, columns, configuration, addData, bulkActions, rowClick }: DataTableProps<TData, TValue> & { addData: () => void, bulkActions?: (e: {type: string; data: any}) => void, rowClick?: (e: {type: string; data: any}) => void } = $props();
+  let { 
+    data, 
+    columns, 
+    configuration, 
+    addData, 
+    bulkActions, 
+    rowClick,
+    pageSizeChanged,
+  }: DataTableProps<TData, TValue> & { 
+    addData: () => void, 
+    bulkActions?: (e: {type: string; data: any}) => void, 
+    rowClick?: (e: {type: string; data: any}) => void 
+    pageSizeChanged?: (e: {type: string; data: any}) => void 
+  } = $props();
 
-  let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
+  let pageSize = $state(configuration?.pageSize ?? 10);
+  let pagination = $state<PaginationState>({ pageIndex: 0, pageSize });
   let columnVisibility = $state<VisibilityState>({});
   let rowSelection = $state<RowSelectionState>({});
   let sorting = $state<SortingState>([]);
@@ -97,6 +113,13 @@
    */
   function resetSelection() {
     table.resetRowSelection();
+  }
+
+  function onPageSizeChanged(e: {type: string, data: any}) {
+    pageSizeChanged && pageSizeChanged(e);
+    table.setPageSize(() => {
+      return Number(e.data)
+    })
   }
  </script>
   
@@ -196,6 +219,10 @@
       {table.getFilteredRowModel().rows.length} row(s) selected.
     </div>
     <div class="flex items-center justify-end">
+      <Combobox
+        configuration={pageSizeOptionsConfiguration} 
+        selectedOption={String(pageSize)}
+        event={onPageSizeChanged}/>
       <Button
         variant="outline"
         size="sm"
