@@ -7,7 +7,7 @@ export const getScansSettings = async (user_id: string): Promise<Omit<ScansSetti
     .eq('user_id', user_id)
     .maybeSingle();
   if (error) {
-    console.error('[getScans]', error)
+    console.error('[getScansSettings]', error)
   }
   return data ?? undefined;
 };

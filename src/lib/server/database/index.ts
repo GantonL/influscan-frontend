@@ -8,4 +8,5 @@ export enum Tables {
   Users = 'users',
   ScansSettings = 'scans_settings',
   UsersStats = 'users_stats',
+  ScansViewSettings = 'scans_view_settings',
 }

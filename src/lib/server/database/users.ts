@@ -31,6 +31,11 @@ export const createUser = async (user: User): Promise<boolean> => {
   if (userStatsError) {
     console.error('[createUser | default user stats]', userStatsError);
   }
+  const { error: userScansViewSettingsError } = await db.from(Tables.ScansViewSettings)
+    .insert({user_id: user.id});
+  if (userScansViewSettingsError) {
+    console.error('[createUser | default user scans view settings]', userScansViewSettingsError);
+  }
   return true;
 };
 

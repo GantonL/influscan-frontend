@@ -39,7 +39,10 @@
 	title.set('Scans');
 
 	$effect.pre(() => {
-		tableConfiguration.pageSize = Number($page.url.searchParams.get('pageSize') ?? $page.data.viewSettings?.pageSize);
+		const configuredPageSize = Number($page.url.searchParams.get('pageSize') ?? $page.data.viewSettings?.page_size);
+		if (configuredPageSize) {
+			tableConfiguration.pageSize = configuredPageSize;
+		}
 	});
 
 	onMount(() => {
@@ -48,7 +51,7 @@
 
 	onDestroy(() => {
 		worker?.terminate();
-	})
+	});
 
 	async function initializeWorker() {
     if (!browser) { return; }
@@ -214,6 +217,14 @@
 	function onPageSizeChanged(newPageSize: number) {
 		$page.url.searchParams.set('pageSize', String(newPageSize));
 		replaceState($page.url, $page.state);
+		const body = new FormData();
+		body.append('data', JSON.stringify({page_size: newPageSize}))
+		fetch('/api/view/scans', {method: 'PUT', body})
+			.then((res) => {
+				res.json().then(res => {
+					console.log(res.success);
+				})
+			})
 	}
 
 </script>
