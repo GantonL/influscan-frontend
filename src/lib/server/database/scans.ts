@@ -1,13 +1,21 @@
 import type { ScanResult } from "$lib/models/scan";
+import type { SortingState } from "@tanstack/table-core";
 import { db, Tables } from ".";
 
 export type CastScanResult = Pick<ScanResult, 'id' | 'created_at' | 'details' | 'estimation' | 'explanation' | 'status' | 'rankings' | 'images' | 'sources'>;
 
-export const getScans = async (user_id: string): Promise<CastScanResult[]> => {
-  const {data, error} = await db.from(Tables.Scans)
+export const getScans = async (user_id: string, options?: {sortBy?: SortingState}): Promise<CastScanResult[]> => {
+  const query = db.from(Tables.Scans)
     .select('id, created_at, status, details, estimation, explanation, rankings')
     .eq('user_id', user_id)
-    .order('created_at', { ascending: false });
+  if (options?.sortBy) {
+    options.sortBy.forEach((sortState) => {
+      query.order(sortState.id, {ascending: !sortState.desc}); 
+    });
+  } else {
+    query.order('created_at', { ascending: false });
+  }
+  const {data, error} = await query;
   if (error) {
     console.error('[getScans]', error)
   }

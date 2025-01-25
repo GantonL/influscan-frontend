@@ -13,13 +13,15 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     return;
   }
   const user = locals.session;
-  const scansResults: CastScanResult[] = await getScans(user.id);
   const scansSettings: Omit<ScansSettings, 'user_id'> | undefined = await getScansSettings(user.id);
   const totalMonthlyScans = await totalMonthlyScansCount(user.id);
   const viewSettings: Omit<ScansViewSettings, 'user_id'> = {};
-  const { page_size } = await getScansViewSettings(user.id);
+  const { page_size, sort_by } = await getScansViewSettings(user.id);
   const pageSizeInSearchParams = url.searchParams.get('pageSize');
+  const sortInSearchParams = url.searchParams.get('sortBy');
   viewSettings.page_size = pageSizeInSearchParams ? Number(pageSizeInSearchParams) : page_size;
+  viewSettings.sort_by = sortInSearchParams ? JSON.parse(sortInSearchParams) : sort_by;
+  const scansResults: CastScanResult[] = await getScans(user.id, {sortBy: viewSettings.sort_by});
   return {
     scansResults,
     scansSettings,

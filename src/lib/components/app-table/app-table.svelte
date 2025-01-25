@@ -31,18 +31,21 @@
     bulkActions, 
     rowClick,
     pageSizeChanged,
+    sortingChanged,
   }: DataTableProps<TData, TValue> & { 
-    addData: () => void, 
-    bulkActions?: (e: {type: string; data: any}) => void, 
-    rowClick?: (e: {type: string; data: any}) => void 
-    pageSizeChanged?: (newPageSize: number) => void 
+    addData: () => void;
+    bulkActions?: (e: {type: string; data: any}) => void; 
+    rowClick?: (e: {type: string; data: any}) => void;
+    pageSizeChanged?: (newPageSize: number) => void;
+    sortingChanged?: (state: SortingState) => void;
   } = $props();
 
   let pageSize = $state(configuration?.pageSize ?? 10);
   let pagination = $state<PaginationState>({ pageIndex: 0, pageSize });
   let columnVisibility = $state<VisibilityState>({});
   let rowSelection = $state<RowSelectionState>({});
-  let sorting = $state<SortingState>([]);
+  let sortingState = $state(configuration?.sortingState);
+  let sorting = $state<SortingState>(sortingState ?? []);
 
   const tableOptions: TableOptions<any> = ({
     get data() {
@@ -56,6 +59,7 @@
       } else {
         sorting = updater;
       }
+      sortingChanged && sortingChanged(sorting);
     },
     onColumnVisibilityChange: (updater) => {
       if (typeof updater === "function") {

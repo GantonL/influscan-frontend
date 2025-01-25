@@ -21,6 +21,7 @@
 	import { onDestroy, onMount } from "svelte";
 	import { browser } from "$app/environment";
 	import { PlansConfiguration } from "$lib/configurations/plans";
+	import type { SortingState } from "@tanstack/table-core";
 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
   let scansSettings = $state<ScansSettings>($page.data.scansSettings ?? {});
@@ -42,6 +43,10 @@
 		const configuredPageSize = $page.data.viewSettings.page_size;
 		if (configuredPageSize) {
 			tableConfiguration.pageSize = configuredPageSize;
+		}
+		const configuredSortBy = $page.data.viewSettings.sort_by;
+		if (configuredSortBy) {
+			tableConfiguration.sortingState = configuredSortBy;
 		}
 	});
 
@@ -218,13 +223,24 @@
 		$page.url.searchParams.set('pageSize', String(newPageSize));
 		replaceState($page.url, $page.state);
 		const body = new FormData();
-		body.append('data', JSON.stringify({page_size: newPageSize}))
+		body.append('data', JSON.stringify({page_size: newPageSize}));
+		const onError = () => toast.error('Failed to update selected page size');
 		fetch('/api/view/scans', {method: 'PUT', body})
 			.then((res) => {
-				res.json().then(res => {
-					console.log(res.success);
-				})
-			})
+				res.json().catch(onError);
+			}, onError)
+	}
+
+	function onSortingChanged(state: SortingState) {
+		$page.url.searchParams.set('sortBy', JSON.stringify(state));
+		replaceState($page.url, $page.state);
+		const body = new FormData();
+		body.append('data', JSON.stringify({sort_by: state}));
+		const onError = () => toast.error('Failed to update page sorting');
+		fetch('/api/view/scans', {method: 'PUT', body})
+			.then((res) => {
+				res.json().catch(onError);
+			}, onError)
 	}
 
 </script>
@@ -234,7 +250,8 @@
 	addData={() => setScanDialogOpenState(true)} 
 	bulkActions={onBulkActions}
 	rowClick={onRowClick}
-	pageSizeChanged={onPageSizeChanged}/>
+	pageSizeChanged={onPageSizeChanged}
+	sortingChanged={onSortingChanged}/>
 
 <Dialog.Root open={addScanDialogOpened} controlledOpen={true} onOpenChange={setScanDialogOpenState}>
   <Dialog.Content>
