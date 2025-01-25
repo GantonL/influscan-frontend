@@ -39,7 +39,7 @@
 	title.set('Scans');
 
 	$effect.pre(() => {
-		const configuredPageSize = Number($page.url.searchParams.get('pageSize') ?? $page.data.viewSettings?.page_size);
+		const configuredPageSize = $page.data.viewSettings.page_size;
 		if (configuredPageSize) {
 			tableConfiguration.pageSize = configuredPageSize;
 		}

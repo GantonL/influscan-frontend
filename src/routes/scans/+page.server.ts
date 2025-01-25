@@ -6,8 +6,9 @@ import { getScans, totalMonthlyScansCount, type CastScanResult } from '$lib/serv
 import { getScansSettings } from '$lib/server/database/scans-settings';
 import type { ScansSettings } from '$lib/models/settings';
 import { getScansViewSettings } from '$lib/server/database/view-settings';
+import type { ScansViewSettings } from '$lib/models/view-settings';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
   if (!locals?.session?.id) {
     return;
   }
@@ -15,7 +16,10 @@ export const load: PageServerLoad = async ({ locals }) => {
   const scansResults: CastScanResult[] = await getScans(user.id);
   const scansSettings: Omit<ScansSettings, 'user_id'> | undefined = await getScansSettings(user.id);
   const totalMonthlyScans = await totalMonthlyScansCount(user.id);
-  const viewSettings = await getScansViewSettings(user.id);
+  const viewSettings: Omit<ScansViewSettings, 'user_id'> = {};
+  const { page_size } = await getScansViewSettings(user.id);
+  const pageSizeInSearchParams = url.searchParams.get('pageSize');
+  viewSettings.page_size = pageSizeInSearchParams ? Number(pageSizeInSearchParams) : page_size;
   return {
     scansResults,
     scansSettings,

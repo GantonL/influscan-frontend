@@ -1,7 +1,7 @@
 import type { ScansViewSettings } from "$lib/models/view-settings";
 import { db, Tables } from ".";
 
-export const getScansViewSettings = async (user_id: string): Promise<Omit<ScansViewSettings, 'user_id'> | undefined> => {
+export const getScansViewSettings = async (user_id: string): Promise<Omit<ScansViewSettings, 'user_id'>> => {
   const {data, error} = await db.from(Tables.ScansViewSettings)
     .select('page_size')
     .eq('user_id', user_id)
@@ -9,7 +9,7 @@ export const getScansViewSettings = async (user_id: string): Promise<Omit<ScansV
   if (error) {
     console.error('[getScansViewSettings]', error)
   }
-  return data ?? undefined;
+  return data ?? {};
 };
 
 export const updateScansViewSettings = async (user_id: string, updateObject: Partial<Omit<ScansViewSettings, 'user_id'>>): Promise<boolean> => {
