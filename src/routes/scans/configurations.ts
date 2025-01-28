@@ -117,6 +117,10 @@ export const tableConfiguration: TableConfiguration<TableScanResult> = {
   onRowClick: {
     event: 'navigate',
     ignoreColumns: ['select']
+  },
+  dateFilter: {
+    enabled: true,
+    path: 'created_at',
   }
 };
 

@@ -7,6 +7,14 @@ import { getScansSettings } from '$lib/server/database/scans-settings';
 import type { ScansSettings } from '$lib/models/settings';
 import { getScansViewSettings } from '$lib/server/database/view-settings';
 import type { ScansViewSettings } from '$lib/models/view-settings';
+import { CalendarDate } from '@internationalized/date';
+import { getDatabaseFiltersFromClientFilters } from '$lib/server/database/utils';
+
+const defaultPageFilter = () => {
+  const now = new Date();
+  const calendar7DaysAgo = new CalendarDate(now.getFullYear(), now.getMonth(), now.getDate()).subtract({days: 7});
+  return {column: 'created_at', operator: 'gte', value: `${calendar7DaysAgo.year}-${calendar7DaysAgo.month}-${calendar7DaysAgo.day}`};
+}
 
 export const load: PageServerLoad = async ({ locals, url }) => {
   if (!locals?.session?.id) {
@@ -16,12 +24,17 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   const scansSettings: Omit<ScansSettings, 'user_id'> | undefined = await getScansSettings(user.id);
   const totalMonthlyScans = await totalMonthlyScansCount(user.id);
   const viewSettings: Omit<ScansViewSettings, 'user_id'> = {};
-  const { page_size, sort_by } = await getScansViewSettings(user.id);
+  const { page_size, sort_by, filters } = await getScansViewSettings(user.id);
   const pageSizeInSearchParams = url.searchParams.get('pageSize');
   const sortInSearchParams = url.searchParams.get('sortBy');
+  const filtersInSearchParams = url.searchParams.get('filters');
   viewSettings.page_size = pageSizeInSearchParams ? Number(pageSizeInSearchParams) : page_size;
   viewSettings.sort_by = sortInSearchParams ? JSON.parse(sortInSearchParams) : sort_by;
-  const scansResults: CastScanResult[] = await getScans(user.id, {sortBy: viewSettings.sort_by});
+  viewSettings.filters = filtersInSearchParams ? JSON.parse(filtersInSearchParams) : filters;
+  const scansResults: CastScanResult[] = await getScans(user.id, {
+    sortBy: viewSettings.sort_by,
+    filters: viewSettings.filters ? getDatabaseFiltersFromClientFilters(viewSettings.filters) : [defaultPageFilter()],
+  });
   return {
     scansResults,
     scansSettings,

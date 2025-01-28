@@ -22,6 +22,7 @@
 	import { browser } from "$app/environment";
 	import { PlansConfiguration } from "$lib/configurations/plans";
 	import type { SortingState } from "@tanstack/table-core";
+	import type { DateFilter } from "$lib/models/filter";
 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
   let scansSettings = $state<ScansSettings>($page.data.scansSettings ?? {});
@@ -36,6 +37,7 @@
 	let scansMonthlyLimit = $state<number>(PlansConfiguration.get($page.data.user.plan)?.monthly_limit ?? 0);
 	let totalMonthlyScansCount = $state<number>($page.data.totalMonthlyScans);
 	let limitReachedDialogOpened = $state(false);
+	let filters: DateFilter[] = $state($page.data.viewSettings.filters ?? []);
 
 	title.set('Scans');
 
@@ -47,6 +49,16 @@
 		const configuredSortBy = $page.data.viewSettings.sort_by;
 		if (configuredSortBy) {
 			tableConfiguration.sortingState = configuredSortBy;
+		}
+		const configuredFilters = $page.data.viewSettings.filters;
+		if (configuredFilters) {
+			if (tableConfiguration.dateFilter?.enabled) {
+				const dateFilter = configuredFilters.find((f: DateFilter) => f.type === 'date');
+				tableConfiguration.dateFilter.initialState = {
+					start: new Date(dateFilter.start),
+					end: new Date(dateFilter.end),
+				}
+			}
 		}
 	});
 
@@ -243,6 +255,35 @@
 			}, onError)
 	}
 
+	function onFilterChanged(filter: DateFilter) {
+		switch (filter.type) {
+			case 'date':
+				let dateFilter = filters?.find((f: DateFilter) => f.type === 'date');
+				if (!dateFilter) {
+					dateFilter = { type: 'date', path: filter.path };
+					filters.push(dateFilter);
+				}
+				if (filter.start) {
+					dateFilter.start = filter.start;
+				}
+				if (filter.end) {
+					dateFilter.end = filter.end;
+					const body = new FormData();
+					body.append('data', JSON.stringify({filters}));
+					const onError = () => toast.error('Failed to update page filters');
+					fetch('/api/view/scans', {method: 'PUT', body})
+						.then((res) => {
+							res.json().catch(onError);
+						}, onError);
+				}
+				$page.url.searchParams.set('filters', JSON.stringify(filters));
+				replaceState($page.url, $page.state);
+				break;
+			default:
+				break;
+		}
+	}
+
 </script>
 <AppTable { columns } data={scans}
 	bind:this={table}
@@ -251,7 +292,8 @@
 	bulkActions={onBulkActions}
 	rowClick={onRowClick}
 	pageSizeChanged={onPageSizeChanged}
-	sortingChanged={onSortingChanged}/>
+	sortingChanged={onSortingChanged}
+	filterChanged={onFilterChanged}/>
 
 <Dialog.Root open={addScanDialogOpened} controlledOpen={true} onOpenChange={setScanDialogOpenState}>
   <Dialog.Content>

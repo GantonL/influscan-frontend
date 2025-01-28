@@ -3,7 +3,7 @@ import { db, Tables } from ".";
 
 export const getScansViewSettings = async (user_id: string): Promise<Omit<ScansViewSettings, 'user_id'>> => {
   const {data, error} = await db.from(Tables.ScansViewSettings)
-    .select('page_size, sort_by')
+    .select('page_size, sort_by, filters')
     .eq('user_id', user_id)
     .maybeSingle();
   if (error) {

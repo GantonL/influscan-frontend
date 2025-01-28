@@ -6,4 +6,9 @@ export interface TableConfiguration<T> {
   onRowClick?: { event: string; ignoreColumns?: string[] };
   pageSize?: number;
   sortingState?: SortingState;
+  dateFilter?: {
+    path: string;
+    enabled?: boolean;
+    initialState?: {start: Date; end?: Date};
+  }
 }

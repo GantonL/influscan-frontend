@@ -1,0 +1,72 @@
+<script lang="ts">
+  import CalendarIcon from "lucide-svelte/icons/calendar";
+  import type { DateRange } from "bits-ui";
+  import {
+   CalendarDate,
+   DateFormatter,
+   type DateValue,
+   getLocalTimeZone
+  } from "@internationalized/date";
+  import { cn } from "$lib/utils.js";
+  import { buttonVariants } from "$lib/components/ui/button/index.js";
+  import { RangeCalendar } from "$lib/components/ui/range-calendar/index.js";
+  import * as Popover from "$lib/components/ui/popover/index.js";
+  
+  let {start, end, startChanged, endChanged}: {
+    start?: Date; 
+    end?: Date, 
+    startChanged?: (value: DateValue) => void, 
+    endChanged?: (value: DateValue) => void
+  } = $props();
+
+  const df = new DateFormatter("en-US", {
+   dateStyle: "medium"
+  });
+  const now = new Date();
+  const calendarNow = new CalendarDate(now.getFullYear(), now.getMonth(), now.getDate());
+  let value: DateRange = $state({
+   start: start ? new CalendarDate(start.getFullYear(), start.getMonth(), start.getDate()) : calendarNow.subtract({days: 7}),
+   end: end ? new CalendarDate(end.getFullYear(), end.getMonth(), end.getDate()) : (start ? undefined : calendarNow),
+  });
+  
+  let startValue: DateValue | undefined = $state(undefined);
+ </script>
+  
+ <div class="grid gap-2">
+  <Popover.Root>
+   <Popover.Trigger
+    class={cn(
+     buttonVariants({ variant: "outline" }),
+     !value && "text-muted-foreground"
+    )}
+   >
+    <CalendarIcon class="mr-2 size-4" />
+    {#if value && value.start}
+     {#if value.end}
+      {df.format(value.start.toDate(getLocalTimeZone()))} - {df.format(
+       value.end.toDate(getLocalTimeZone())
+      )}
+     {:else}
+      {df.format(value.start.toDate(getLocalTimeZone()))}
+     {/if}
+    {:else if startValue}
+     {df.format(startValue.toDate(getLocalTimeZone()))}
+    {:else}
+     Pick a date
+    {/if}
+   </Popover.Trigger>
+   <Popover.Content class="w-auto p-0" align="start">
+    <RangeCalendar
+     bind:value
+     onStartValueChange={(v) => {
+      startValue = v;
+      (startChanged && v) && startChanged(v)
+     }}
+     numberOfMonths={2}
+     onEndValueChange={(v) => {
+      (endChanged && v) && endChanged(v)
+     }}
+    />
+   </Popover.Content>
+  </Popover.Root>
+ </div>

@@ -16,6 +16,9 @@
 	import Menu from "../menu/menu.svelte";
 	import Combobox from "../combobox/combobox.svelte";
 	import { pageSizeOptionsConfiguration } from "./defaults";
+	import DateRangePicker from "../date-range-picker/date-range-picker.svelte";
+	import { type DateFilter } from "$lib/models/filter";
+  
 
   type DataTableProps<TData, TValue> = {
    columns: ColumnDef<TData, TValue>[];
@@ -32,12 +35,14 @@
     rowClick,
     pageSizeChanged,
     sortingChanged,
+    filterChanged
   }: DataTableProps<TData, TValue> & { 
     addData: () => void;
     bulkActions?: (e: {type: string; data: any}) => void; 
     rowClick?: (e: {type: string; data: any}) => void;
     pageSizeChanged?: (newPageSize: number) => void;
     sortingChanged?: (state: SortingState) => void;
+    filterChanged?: (state: DateFilter) => void;
   } = $props();
 
   let pageSize = $state(configuration?.pageSize ?? 10);
@@ -188,6 +193,14 @@
         <Menu rawData={table.getFilteredSelectedRowModel().rows.map(r => r.original)} configuration={configuration.bulkActions} event={onBulkMenu}/>
       {/if}
     </div>
+    {#if configuration?.dateFilter?.enabled}
+      <DateRangePicker 
+        start={configuration.dateFilter.initialState?.start}
+        end={configuration.dateFilter.initialState?.end}
+        startChanged={(v) => filterChanged && filterChanged({type: 'date', path: configuration.dateFilter!.path, start: `${v.year}-${v.month}-${v.day}`})}
+        endChanged={(v) => filterChanged && filterChanged({type: 'date', path: configuration.dateFilter!.path, end: `${v.year}-${v.month}-${v.day}`})}
+        />
+    {/if}
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
         {#snippet child({ props })}
