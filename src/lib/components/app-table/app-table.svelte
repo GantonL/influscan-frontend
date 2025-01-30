@@ -196,6 +196,7 @@
     <div class="flex flex-row gap-2 items-center">
       {#if configuration?.dateFilter?.enabled}
         <DateRangePicker
+          useIsMobile={true}
           start={configuration.dateFilter.initialState?.start}
           end={configuration.dateFilter.initialState?.end}
           startChanged={(v) => filterChanged && filterChanged({type: 'date', path: configuration.dateFilter!.path, start: `${v.year}-${v.month}-${v.day}`})}
