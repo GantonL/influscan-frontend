@@ -193,38 +193,40 @@
         <Menu rawData={table.getFilteredSelectedRowModel().rows.map(r => r.original)} configuration={configuration.bulkActions} event={onBulkMenu}/>
       {/if}
     </div>
-    {#if configuration?.dateFilter?.enabled}
-      <DateRangePicker 
-        start={configuration.dateFilter.initialState?.start}
-        end={configuration.dateFilter.initialState?.end}
-        startChanged={(v) => filterChanged && filterChanged({type: 'date', path: configuration.dateFilter!.path, start: `${v.year}-${v.month}-${v.day}`})}
-        endChanged={(v) => filterChanged && filterChanged({type: 'date', path: configuration.dateFilter!.path, end: `${v.year}-${v.month}-${v.day}`})}
-        />
-    {/if}
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger>
-        {#snippet child({ props })}
-          <Button {...props} variant="outline" class="flex flex-row gap-2 items-center">
-            <Settings2 />
-            <span>View</span>
-          </Button>
-        {/snippet}
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content align="end">
-        {#each table
-          .getAllColumns()
-          .filter((col) => col.getCanHide()) as column (column.id)}
-          <DropdownMenu.CheckboxItem
-            class="capitalize"
-            controlledChecked
-            checked={column.getIsVisible()}
-            onCheckedChange={(value) => column.toggleVisibility(!!value)}
-          >
-            {column.id}
-          </DropdownMenu.CheckboxItem>
-        {/each}
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
+    <div class="flex flex-row gap-2 items-center">
+      {#if configuration?.dateFilter?.enabled}
+        <DateRangePicker
+          start={configuration.dateFilter.initialState?.start}
+          end={configuration.dateFilter.initialState?.end}
+          startChanged={(v) => filterChanged && filterChanged({type: 'date', path: configuration.dateFilter!.path, start: `${v.year}-${v.month}-${v.day}`})}
+          endChanged={(v) => filterChanged && filterChanged({type: 'date', path: configuration.dateFilter!.path, end: `${v.year}-${v.month}-${v.day}`})}
+          />
+      {/if}
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger>
+          {#snippet child({ props })}
+            <Button {...props} variant="outline" class="flex flex-row gap-2 items-center">
+              <Settings2 />
+              <span>View</span>
+            </Button>
+          {/snippet}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content align="end">
+          {#each table
+            .getAllColumns()
+            .filter((col) => col.getCanHide()) as column (column.id)}
+            <DropdownMenu.CheckboxItem
+              class="capitalize"
+              controlledChecked
+              checked={column.getIsVisible()}
+              onCheckedChange={(value) => column.toggleVisibility(!!value)}
+            >
+              {column.id}
+            </DropdownMenu.CheckboxItem>
+          {/each}
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    </div>
   </div>
  {/snippet}
 
