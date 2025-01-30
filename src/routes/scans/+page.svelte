@@ -23,6 +23,7 @@
 	import { PlansConfiguration } from "$lib/configurations/plans";
 	import type { SortingState } from "@tanstack/table-core";
 	import type { DateFilter } from "$lib/models/filter";
+	import { createUrlFilters } from "$lib/utils";
 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
   let scansSettings = $state<ScansSettings>($page.data.scansSettings ?? {});
@@ -276,7 +277,7 @@
 							res.json().catch(onError);
 						}, onError);
 				}
-				$page.url.searchParams.set('filters', JSON.stringify(filters));
+				$page.url.searchParams.set('filters', createUrlFilters(filters));
 				replaceState($page.url, $page.state);
 				break;
 			default:
