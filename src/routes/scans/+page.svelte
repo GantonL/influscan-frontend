@@ -9,7 +9,7 @@
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
 	import { HelpCircle, LoaderCircle } from "lucide-svelte";
-	import { buildScanResultObjectFromParsedRawData, createScanObject, deleteScanObject, type OmittedScanResult } from "./utilities";
+	import { buildScanResultObjectFromParsedRawData, createScanObject, deleteScanObject, getScansResults, type OmittedScanResult } from "./utilities";
 	import * as Form from "$lib/components/ui/form";
 	import { superForm } from "sveltekit-superforms";
 	import { zodClient } from "sveltekit-superforms/adapters";
@@ -39,6 +39,7 @@
 	let totalMonthlyScansCount = $state<number>($page.data.totalMonthlyScans);
 	let limitReachedDialogOpened = $state(false);
 	let filters: DateFilter[] = $state($page.data.viewSettings.filters ?? []);
+	let fetchInProgress = $state(false);
 
 	title.set('Scans');
 
@@ -263,26 +264,48 @@
 				if (!dateFilter) {
 					dateFilter = { type: 'date', path: filter.path };
 					filters.push(dateFilter);
+				} else {
+					if (
+						((filter.start === dateFilter.start) && (filter.end === undefined)) ||
+						((filter.start === undefined) && (filter.end === dateFilter.end)) ||
+						((filter.start === dateFilter.start) && (filter.end === dateFilter.end))
+					) {
+						return;
+					}
 				}
 				if (filter.start) {
 					dateFilter.start = filter.start;
 				}
 				if (filter.end) {
 					dateFilter.end = filter.end;
-					const body = new FormData();
-					body.append('data', JSON.stringify({filters}));
-					const onError = () => toast.error('Failed to update page filters');
-					fetch('/api/view/scans', {method: 'PUT', body})
-						.then((res) => {
-							res.json().catch(onError);
-						}, onError);
 				}
+				const body = new FormData();
+				body.append('data', JSON.stringify({filters}));
+				const onError = () => toast.error('Failed to update page filters');
+				fetch('/api/view/scans', {method: 'PUT', body})
+					.then((res) => {
+						res.json().catch(onError);
+					}, onError);
 				$page.url.searchParams.set('filters', createUrlFilters(filters));
 				replaceState($page.url, $page.state);
 				break;
 			default:
 				break;
 		}
+		fetchInProgress = true;
+		const onError = () => {
+			fetchInProgress = false;
+			toast.error('Failed to fetch scans results');
+		}
+		getScansResults({
+			sortBy: createUrlSort($page.data.viewSettings.sort_by),
+			pageSize: $page.data.viewSettings.page_size,
+			filters: createUrlFilters(filters)
+		})
+		.then(res => {
+			scans = res;
+			fetchInProgress = false;
+		}, onError);
 	}
 
 </script>

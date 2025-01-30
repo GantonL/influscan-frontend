@@ -1,5 +1,19 @@
 import { error, json, type RequestHandler } from "@sveltejs/kit";
-import { createScans, deleteScans, updateScan } from "$lib/server/database/scans";
+import { createScans, deleteScans, getScans, updateScan } from "$lib/server/database/scans";
+import { parseUrlFilters, parseUrlSort } from "$lib/utils";
+import { getDatabaseFiltersFromClientFilters } from "$lib/server/database/utils";
+
+export const GET: RequestHandler = async ({locals, url}) => {
+  const userId = locals.session?.id;
+  const sortInSearchParams = url.searchParams.get('sortBy');
+  const filtersInSearchParams = url.searchParams.get('filters');
+  if (!userId) { error(400); }
+  const scanResults = await getScans(userId, {
+    sortBy: parseUrlSort(sortInSearchParams ?? []),
+    filters: getDatabaseFiltersFromClientFilters(parseUrlFilters(filtersInSearchParams ?? []) ?? []),
+  });
+  return json(scanResults);
+}
 
 export const POST: RequestHandler = async ({request, locals}) => {
   const data = await request.formData();

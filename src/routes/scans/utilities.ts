@@ -133,3 +133,26 @@ export const analyze = async (candidateDetails: string, searchResults: Pick<Goog
       }, reject);
   });
 }
+
+export const getScansResults = async (options?: { fetch?: RequestEvent['fetch']; filters?: string; sortBy?: string; pageSize?: number;}): Promise<OmittedScanResult[]> => {
+  return new Promise((resolve, reject) => {
+    const request = options?.fetch ?? fetch;
+    let searchParams = '';
+    if (options?.filters) {
+      searchParams = `filters=${options.filters}`;
+    }
+    if (options?.sortBy) {
+      searchParams = searchParams.concat(`&sortBy=${options.sortBy}`)
+    }
+    if (options?.pageSize) {
+      searchParams = searchParams.concat(`&pageSize=${options.pageSize}`)
+    }
+    request(`/api/results?${searchParams}`, {method: 'GET'})
+      .then((res) => {
+        res.json()
+          .then((res) => {
+            resolve(res);
+          }, reject);
+      }, reject);
+  });
+}

@@ -8,6 +8,6 @@ export const PUT: RequestHandler = async ({request, locals}) => {
   const response: { success: boolean } = { success: false };
   if (!userId || !viewSettings) { error(400); }
   const parsedViewSettings = JSON.parse(viewSettings);
-  response.success  = await updateScansViewSettings(userId, parsedViewSettings);
+  response.success = await updateScansViewSettings(userId, parsedViewSettings);
   return json(response);
 }
