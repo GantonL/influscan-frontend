@@ -23,7 +23,7 @@
 	import { PlansConfiguration } from "$lib/configurations/plans";
 	import type { SortingState } from "@tanstack/table-core";
 	import type { DateFilter } from "$lib/models/filter";
-	import { createUrlFilters } from "$lib/utils";
+	import { createUrlFilters, createUrlSort } from "$lib/utils";
 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
   let scansSettings = $state<ScansSettings>($page.data.scansSettings ?? {});
@@ -245,7 +245,7 @@
 	}
 
 	function onSortingChanged(state: SortingState) {
-		$page.url.searchParams.set('sortBy', JSON.stringify(state));
+		$page.url.searchParams.set('sortBy', createUrlSort(state));
 		replaceState($page.url, $page.state);
 		const body = new FormData();
 		body.append('data', JSON.stringify({sort_by: state}));

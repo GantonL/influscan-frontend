@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { DateFilter } from "./models/filter";
+import type { SortingState } from "@tanstack/table-core";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -46,6 +47,30 @@ export function createUrlFilters(filters: DateFilter[]): string {
 			default:
 				break;
 		}
+	})
+	return result;
+}
+
+export function parseUrlSort(sortState: string | string[]): SortingState | undefined {
+	const sortToParse = typeof sortState === 'string' ? [sortState] : sortState;
+	if (sortToParse.length=== 0) {return;}
+	const state: SortingState = [];
+	sortToParse.forEach((sort) => {
+		state.push({
+			id: sort.slice(1),
+			desc: sort.slice(0, 1) === '-'
+		})
+	});
+	return state;
+}
+
+export function createUrlSort(sortState: SortingState): string {
+	let result = '';
+	sortState.forEach(sort => {
+		if (result.length > 0) {
+			result = result.concat(',');
+		}
+		result = result.concat(`${sort.desc ? '-' : '+'}${sort.id}`)
 	})
 	return result;
 }

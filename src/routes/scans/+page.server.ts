@@ -9,7 +9,7 @@ import { getScansViewSettings } from '$lib/server/database/view-settings';
 import type { ScansViewSettings } from '$lib/models/view-settings';
 import { CalendarDate } from '@internationalized/date';
 import { getDatabaseFiltersFromClientFilters } from '$lib/server/database/utils';
-import { parseUrlFilters } from '$lib/utils';
+import { parseUrlFilters, parseUrlSort } from '$lib/utils';
 
 const defaultPageFilter = () => {
   const now = new Date();
@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   const sortInSearchParams = url.searchParams.get('sortBy');
   const filtersInSearchParams = url.searchParams.get('filters');
   viewSettings.page_size = pageSizeInSearchParams ? Number(pageSizeInSearchParams) : page_size;
-  viewSettings.sort_by = sortInSearchParams ? JSON.parse(sortInSearchParams) : sort_by;
+  viewSettings.sort_by = sortInSearchParams ? parseUrlSort(sortInSearchParams) : sort_by;
   viewSettings.filters = filtersInSearchParams ? parseUrlFilters(filtersInSearchParams) : filters;
   const scansResults: CastScanResult[] = await getScans(user.id, {
     sortBy: viewSettings.sort_by,
