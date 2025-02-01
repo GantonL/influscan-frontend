@@ -21,14 +21,16 @@
   
 
   type DataTableProps<TData, TValue> = {
-   columns: ColumnDef<TData, TValue>[];
-   data: TData[];
-   configuration?: TableConfiguration<TData>;
+    columns: ColumnDef<TData, TValue>[];
+    data: TData[];
+    configuration?: TableConfiguration<TData>;
+    disabled?: boolean;
   };
   
   let { 
     data, 
-    columns, 
+    columns,
+    disabled,
     configuration, 
     addData, 
     bulkActions, 
@@ -117,7 +119,7 @@
   }
 
   function onRowClick(columnId: string, data: any) {
-    if (!configuration?.onRowClick) { return; }
+    if (!configuration?.onRowClick || disabled) { return; }
     if (configuration.onRowClick.ignoreColumns?.includes(columnId)) { return; }
     rowClick && 
     rowClick({type: configuration.onRowClick.event, data})
@@ -187,6 +189,7 @@
   <div class="flex flex-row gap-2 justify-between">
     <div class="flex flex-row gap-2 items-center">
       <Button
+        {disabled}
         variant="outline"
         onclick={() => addData()}
       >
@@ -196,12 +199,16 @@
         </div>
       </Button>
       {#if configuration?.bulkActions && (table.getIsSomePageRowsSelected() || table.getIsAllPageRowsSelected() || table.getIsAllRowsSelected())}
-        <Menu rawData={table.getFilteredSelectedRowModel().rows.map(r => r.original)} configuration={configuration.bulkActions} event={onBulkMenu}/>
+        <Menu
+          {disabled} 
+          rawData={table.getFilteredSelectedRowModel().rows.map(r => r.original)} 
+          configuration={configuration.bulkActions} event={onBulkMenu}/>
       {/if}
     </div>
     <div class="flex flex-row gap-2 items-center">
       {#if configuration?.dateFilter?.enabled}
         <DateRangePicker
+          {disabled}
           useIsMobile={true}
           start={configuration.dateFilter.initialState?.start}
           end={configuration.dateFilter.initialState?.end}
@@ -212,7 +219,7 @@
       <DropdownMenu.Root>
         <DropdownMenu.Trigger>
           {#snippet child({ props })}
-            <Button {...props} variant="outline" class="flex flex-row gap-2 items-center">
+            <Button {...props} {disabled} variant="outline" class="flex flex-row gap-2 items-center">
               <Settings2 />
               <span>View</span>
             </Button>
@@ -223,6 +230,7 @@
             .getAllColumns()
             .filter((col) => col.getCanHide()) as column (column.id)}
             <DropdownMenu.CheckboxItem
+              {disabled}
               class="capitalize"
               controlledChecked
               checked={column.getIsVisible()}
@@ -245,6 +253,7 @@
     </div>
     <div class="flex items-center justify-end">
       <Combobox
+        {disabled}
         configuration={pageSizeOptionsConfiguration} 
         selectedOption={String(pageSize)}
         event={onPageSizeChanged}/>
@@ -252,7 +261,7 @@
         variant="outline"
         size="sm"
         onclick={() => table.previousPage()}
-        disabled={!table.getCanPreviousPage()}
+        disabled={!table.getCanPreviousPage() || disabled}
       >
         <ChevronLeft />
       </Button>
@@ -260,7 +269,7 @@
         variant="outline"
         size="sm"
         onclick={() => table.nextPage()}
-        disabled={!table.getCanNextPage()}
+        disabled={!table.getCanNextPage() || disabled}
       >
         <ChevronRight />
       </Button>

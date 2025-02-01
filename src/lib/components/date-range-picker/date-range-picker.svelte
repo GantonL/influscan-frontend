@@ -13,10 +13,11 @@
   import * as Popover from "$lib/components/ui/popover/index.js";
 	import { useSidebar } from "../ui/sidebar/context.svelte";
   
-  let {useIsMobile, start, end, startChanged, endChanged}: {
+  let {useIsMobile, start, end, disabled, startChanged, endChanged}: {
     useIsMobile?: boolean,
     start?: Date; 
-    end?: Date, 
+    end?: Date;
+    disabled?: boolean;
     startChanged?: (value: DateValue) => void, 
     endChanged?: (value: DateValue) => void
   } = $props();
@@ -38,6 +39,7 @@
  <div class="grid gap-2">
   <Popover.Root>
    <Popover.Trigger
+    {disabled}
     class={cn(
      buttonVariants({ variant: "outline" }),
      !value && "text-muted-foreground"

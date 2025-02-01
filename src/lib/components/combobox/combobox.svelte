@@ -37,7 +37,7 @@
  </script>
   
  <Popover.Root bind:open>
-  <Popover.Trigger bind:ref={triggerRef}>
+  <Popover.Trigger bind:ref={triggerRef} {disabled}>
    {#snippet child({ props })}
     <div class="flex flex-col gap-2">
       <Button

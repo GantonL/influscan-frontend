@@ -4,15 +4,21 @@
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 	import type { MenuConfiguration } from "$lib/models/menu";
   
-  let { rawData, configuration, event }: { rawData: any, configuration: MenuConfiguration<any>, event: (e: {type: string; data: any}) => void } = $props();
+  let { rawData, configuration, disabled, event }: { 
+    rawData: any; 
+    configuration: MenuConfiguration<any>; 
+    disabled?: boolean; 
+    event: (e: {type: string; data: any}) => void;
+  } = $props();
   
 </script>
 
   
 <DropdownMenu.Root>
-<DropdownMenu.Trigger>
+<DropdownMenu.Trigger {disabled}>
   {#snippet child({ props })}
   <Button
+    {disabled}
     {...props}
     variant={configuration.buttonVariant ?? "ghost"}
     size={configuration.label ? "default" : "icon"}
