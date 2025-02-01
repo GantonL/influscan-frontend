@@ -48,7 +48,7 @@
   } = $props();
 
   let pageSize = $state(configuration?.pageSize ?? 10);
-  let pagination = $state<PaginationState>({ pageIndex: 0, pageSize });
+  let pagination = $state<PaginationState>({ pageIndex: configuration?.pageIndex ?? 0, pageSize });
   let rowCount = $state(configuration?.serverSide?.totalItems);
   let columnVisibility = $state<VisibilityState>({});
   let rowSelection = $state<RowSelectionState>({});

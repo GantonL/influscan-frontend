@@ -27,17 +27,20 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   const viewSettings: Omit<ScansViewSettings, 'user_id'> = {};
   const { page_size, sort_by, filters } = await getScansViewSettings(user.id);
   const pageSizeInSearchParams = url.searchParams.get('pageSize');
+  const pageIndexInSearchParams = url.searchParams.get('pageIndex');
   const sortInSearchParams = url.searchParams.get('sortBy');
   const filtersInSearchParams = url.searchParams.get('filters');
   viewSettings.page_size = pageSizeInSearchParams ? Number(pageSizeInSearchParams) : page_size;
   viewSettings.sort_by = sortInSearchParams ? parseUrlSort(sortInSearchParams) : sort_by;
   viewSettings.filters = filtersInSearchParams ? parseUrlFilters(filtersInSearchParams) : filters;
+  viewSettings.page_index = pageIndexInSearchParams ? Number(pageIndexInSearchParams) : undefined;
   const dbFilters = viewSettings.filters ? getDatabaseFiltersFromClientFilters(viewSettings.filters) : [defaultPageFilter()]; 
   const totalScansResults = await countScans(user.id, { filters: dbFilters });
   const scansResults: CastScanResult[] = await getScans(user.id, {
     sortBy: viewSettings.sort_by,
     filters: dbFilters,
     limit: viewSettings.page_size,
+    offset: viewSettings.page_index && viewSettings.page_size ? (viewSettings.page_index * viewSettings.page_size) + 1 : 0,
   });
   return {
     totalScansResults,

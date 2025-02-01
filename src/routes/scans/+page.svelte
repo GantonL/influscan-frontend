@@ -50,6 +50,10 @@
 		if (configuredPageSize) {
 			tableConfiguration.pageSize = configuredPageSize;
 		}
+		const configuredPageIndex = $page.data.viewSettings.page_index;
+		if (configuredPageIndex) {
+			tableConfiguration.pageIndex = configuredPageIndex;
+		}
 		const configuredSortBy = $page.data.viewSettings.sort_by;
 		if (configuredSortBy) {
 			tableConfiguration.sortingState = configuredSortBy;
@@ -319,6 +323,8 @@
 	}
 
 	function onPageIndexChanged(newIndex: number) {
+		$page.url.searchParams.set('pageIndex', String(newIndex));
+		replaceState($page.url, $page.state);
 		fetchInProgress = true;
 		const onError = () => {
 			fetchInProgress = false;

@@ -5,6 +5,7 @@ export interface TableConfiguration<T> {
   bulkActions?: MenuConfiguration<T>;
   onRowClick?: { event: string; ignoreColumns?: string[] };
   pageSize?: number;
+  pageIndex?: number;
   sortingState?: SortingState;
   dateFilter?: {
     path: string;

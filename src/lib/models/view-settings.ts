@@ -4,6 +4,7 @@ import type { DateFilter } from "./filter";
 export interface BaseViewSettings {
   user_id: string;
   page_size?: number;
+  page_index?: number;
   sort_by?: SortingState;
   filters?: DateFilter[];
 }
