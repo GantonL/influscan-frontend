@@ -18,6 +18,7 @@ export interface ScanResult {
 export interface ScanResultRanking {
   platform: string;
   followers: number;
+  link?: string;
 } 
 
 export interface ScanResultDetails {

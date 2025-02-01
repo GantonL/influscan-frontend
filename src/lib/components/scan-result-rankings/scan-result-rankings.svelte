@@ -10,13 +10,15 @@
   <Tooltip.Provider>
     <Tooltip.Root>
       <Tooltip.Trigger>
-        <Badge variant="secondary" class="flex flex-row gap-2 items-center p-2">
-          {@render socialIcon(rank.platform)}
-          <span>{rank.followers?.toLocaleString('en', {
-            notation: "compact",
-            compactDisplay: "short"
-            })}</span>
-        </Badge>
+        <a href={rank.link} target="_blank">
+          <Badge variant="secondary" class="flex flex-row gap-2 items-center p-2">
+            {@render socialIcon(rank.platform)}
+            <span>{rank.followers?.toLocaleString('en', {
+              notation: "compact",
+              compactDisplay: "short"
+              })}</span>
+          </Badge>
+        </a>
       </Tooltip.Trigger>
       <Tooltip.Content>{rank.platform}</Tooltip.Content>
     </Tooltip.Root>
