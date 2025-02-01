@@ -34,6 +34,7 @@
     bulkActions, 
     rowClick,
     pageSizeChanged,
+    pageIndexChanged,
     sortingChanged,
     filterChanged
   }: DataTableProps<TData, TValue> & { 
@@ -41,12 +42,14 @@
     bulkActions?: (e: {type: string; data: any}) => void; 
     rowClick?: (e: {type: string; data: any}) => void;
     pageSizeChanged?: (newPageSize: number) => void;
+    pageIndexChanged?: (newPageIndex: number) => void;
     sortingChanged?: (state: SortingState) => void;
     filterChanged?: (state: DateFilter) => void;
   } = $props();
 
   let pageSize = $state(configuration?.pageSize ?? 10);
   let pagination = $state<PaginationState>({ pageIndex: 0, pageSize });
+  let rowCount = $state(configuration?.serverSide?.totalItems);
   let columnVisibility = $state<VisibilityState>({});
   let rowSelection = $state<RowSelectionState>({});
   let sortingState = $state(configuration?.sortingState);
@@ -57,6 +60,7 @@
       return data;
     },
     columns,
+    rowCount,
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: (updater) => {
       if (typeof updater === "function") {
@@ -79,6 +83,7 @@
       } else {
         pagination = updater;
       }
+      pageIndexChanged && pageIndexChanged(pagination.pageIndex);
     },
     onRowSelectionChange: (updater) => {
       if (typeof updater === "function") {
@@ -103,6 +108,7 @@
     },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: !!rowCount,
   })
   const table = createSvelteTable(tableOptions);
 

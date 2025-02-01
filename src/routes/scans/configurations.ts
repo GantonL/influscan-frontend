@@ -121,6 +121,9 @@ export const tableConfiguration: TableConfiguration<TableScanResult> = {
   dateFilter: {
     enabled: true,
     path: 'created_at',
+  },
+  serverSide: {
+    enabled: true,
   }
 };
 

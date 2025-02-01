@@ -10,5 +10,9 @@ export interface TableConfiguration<T> {
     path: string;
     enabled?: boolean;
     initialState?: {start: Date; end?: Date};
+  },
+  serverSide?: {
+    enabled: boolean;
+    totalItems?: number;
   }
 }

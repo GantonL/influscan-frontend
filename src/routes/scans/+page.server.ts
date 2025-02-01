@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail, superValidate } from 'sveltekit-superforms';
 import { singleScanformSchema } from './configurations';
 import { zod } from 'sveltekit-superforms/adapters';
-import { getScans, totalMonthlyScansCount, type CastScanResult } from '$lib/server/database/scans';
+import { countScans, getScans, totalMonthlyScansCount, type CastScanResult } from '$lib/server/database/scans';
 import { getScansSettings } from '$lib/server/database/scans-settings';
 import type { ScansSettings } from '$lib/models/settings';
 import { getScansViewSettings } from '$lib/server/database/view-settings';
@@ -32,11 +32,15 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   viewSettings.page_size = pageSizeInSearchParams ? Number(pageSizeInSearchParams) : page_size;
   viewSettings.sort_by = sortInSearchParams ? parseUrlSort(sortInSearchParams) : sort_by;
   viewSettings.filters = filtersInSearchParams ? parseUrlFilters(filtersInSearchParams) : filters;
+  const dbFilters = viewSettings.filters ? getDatabaseFiltersFromClientFilters(viewSettings.filters) : [defaultPageFilter()]; 
+  const totalScansResults = await countScans(user.id, { filters: dbFilters });
   const scansResults: CastScanResult[] = await getScans(user.id, {
     sortBy: viewSettings.sort_by,
-    filters: viewSettings.filters ? getDatabaseFiltersFromClientFilters(viewSettings.filters) : [defaultPageFilter()],
+    filters: dbFilters,
+    limit: viewSettings.page_size,
   });
   return {
+    totalScansResults,
     scansResults,
     scansSettings,
     user,

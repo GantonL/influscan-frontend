@@ -5,7 +5,13 @@ import type { DatabaseFilter } from "$lib/models/filter";
 
 export type CastScanResult = Pick<ScanResult, 'id' | 'created_at' | 'details' | 'estimation' | 'explanation' | 'status' | 'rankings' | 'images' | 'sources'>;
 
-export const getScans = async (user_id: string, options?: {sortBy?: SortingState, filters?: DatabaseFilter[]}): Promise<CastScanResult[]> => {
+export const getScans = async (user_id: string, options?: {
+  sortBy?: SortingState, 
+  filters?: DatabaseFilter[],
+  limit?: number;
+  offset?: number;
+  count?: boolean;
+}): Promise<CastScanResult[]> => {
   const query = db.from(Tables.Scans)
     .select('id, created_at, status, details, estimation, explanation, rankings')
     .eq('user_id', user_id)
@@ -21,12 +27,36 @@ export const getScans = async (user_id: string, options?: {sortBy?: SortingState
   } else {
     query.order('created_at', { ascending: false });
   }
+  if (options?.limit && !options?.offset) {
+    query.limit(options.limit);
+  }
+  if (options?.offset) {
+    query.range(options.offset, (options.limit ?? 10) + options.offset);
+  }
   const {data, error} = await query;
   if (error) {
     console.error('[getScans]', error)
   }
   return data ?? [];
 };
+
+export const countScans = async (user_id: string, options?: {
+  filters?: DatabaseFilter[],
+}): Promise<number> => {
+  const query = db.from(Tables.Scans)
+    .select('id', {count: 'estimated'})
+    .eq('user_id', user_id)
+  if (options?.filters) {
+    options.filters.forEach((filter) => {
+      query.filter(filter.column, filter.operator, filter.value);
+    })
+  }
+  const {count, error} = await query;
+  if (error) {
+    console.error('[countScans]', error)
+  }
+  return count ?? 0;
+}
 
 export const getScan = async (user_id: string, id: ScanResult['id']): Promise<CastScanResult | undefined> => {
   const {data, error} = await db.from(Tables.Scans)

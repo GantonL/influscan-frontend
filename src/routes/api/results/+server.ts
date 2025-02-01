@@ -7,10 +7,14 @@ export const GET: RequestHandler = async ({locals, url}) => {
   const userId = locals.session?.id;
   const sortInSearchParams = url.searchParams.get('sortBy');
   const filtersInSearchParams = url.searchParams.get('filters');
+  const pageSizeInSearchParams = url.searchParams.get('pageSize');
+  const offsetInSearchParams = url.searchParams.get('offset');
   if (!userId) { error(400); }
   const scanResults = await getScans(userId, {
     sortBy: parseUrlSort(sortInSearchParams ?? []),
     filters: getDatabaseFiltersFromClientFilters(parseUrlFilters(filtersInSearchParams ?? []) ?? []),
+    limit: pageSizeInSearchParams ? Number(pageSizeInSearchParams?.toString()) : undefined,
+    offset: offsetInSearchParams ? Number(offsetInSearchParams?.toString()) : undefined,
   });
   return json(scanResults);
 }

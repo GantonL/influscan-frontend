@@ -134,7 +134,7 @@ export const analyze = async (candidateDetails: string, searchResults: Pick<Goog
   });
 }
 
-export const getScansResults = async (options?: { fetch?: RequestEvent['fetch']; filters?: string; sortBy?: string; pageSize?: number;}): Promise<OmittedScanResult[]> => {
+export const getScansResults = async (options?: { fetch?: RequestEvent['fetch']; filters?: string; sortBy?: string; pageSize?: number; offset?: number}): Promise<OmittedScanResult[]> => {
   return new Promise((resolve, reject) => {
     const request = options?.fetch ?? fetch;
     let searchParams = '';
@@ -147,7 +147,27 @@ export const getScansResults = async (options?: { fetch?: RequestEvent['fetch'];
     if (options?.pageSize) {
       searchParams = searchParams.concat(`&pageSize=${options.pageSize}`)
     }
+    if (options?.offset) {
+      searchParams = searchParams.concat(`&offset=${options.offset}`)
+    }
     request(`/api/results?${searchParams}`, {method: 'GET'})
+      .then((res) => {
+        res.json()
+          .then((res) => {
+            resolve(res);
+          }, reject);
+      }, reject);
+  });
+}
+
+export const getScansResultsCount = async (options?: { fetch?: RequestEvent['fetch']; filters?: string;}): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    const request = options?.fetch ?? fetch;
+    let searchParams = '';
+    if (options?.filters) {
+      searchParams = `filters=${options.filters}`;
+    }
+    request(`/api/results/count?${searchParams}`, {method: 'GET'})
       .then((res) => {
         res.json()
           .then((res) => {

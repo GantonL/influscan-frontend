@@ -9,7 +9,7 @@
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
 	import { HelpCircle, LoaderCircle } from "lucide-svelte";
-	import { buildScanResultObjectFromParsedRawData, createScanObject, deleteScanObject, getScansResults, type OmittedScanResult } from "./utilities";
+	import { buildScanResultObjectFromParsedRawData, createScanObject, deleteScanObject, getScansResults, getScansResultsCount, type OmittedScanResult } from "./utilities";
 	import * as Form from "$lib/components/ui/form";
 	import { superForm } from "sveltekit-superforms";
 	import { zodClient } from "sveltekit-superforms/adapters";
@@ -26,6 +26,7 @@
 	import { createUrlFilters, createUrlSort } from "$lib/utils";
 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
+	let totalResults = $state($page.data.totalScansResults);
   let scansSettings = $state<ScansSettings>($page.data.scansSettings ?? {});
 	let addScanDialogOpened = $state(false);
 	let submitInprogress = $state(false);
@@ -44,6 +45,7 @@
 	title.set('Scans');
 
 	$effect.pre(() => {
+		tableConfiguration.serverSide!.totalItems = totalResults;
 		const configuredPageSize = $page.data.viewSettings.page_size;
 		if (configuredPageSize) {
 			tableConfiguration.pageSize = configuredPageSize;
@@ -247,7 +249,7 @@
 
 	function onSortingChanged(state: SortingState) {
 		$page.url.searchParams.set('sortBy', createUrlSort(state));
-		replaceState($page.url, $page.state);
+		replaceState($page.url, $page.state); 
 		const body = new FormData();
 		body.append('data', JSON.stringify({sort_by: state}));
 		const onError = () => toast.error('Failed to update page sorting');
@@ -297,27 +299,58 @@
 			fetchInProgress = false;
 			toast.error('Failed to fetch scans results');
 		}
-		getScansResults({
-			sortBy: createUrlSort($page.data.viewSettings.sort_by),
-			pageSize: $page.data.viewSettings.page_size,
-			filters: createUrlFilters(filters)
+		const urlFilters = createUrlFilters(filters);
+		getScansResultsCount({
+			filters: urlFilters
 		})
-		.then(res => {
-			scans = res;
+		.then((count) => {
+			totalResults = count;
+			tableConfiguration.serverSide!.totalItems = totalResults;
+			getScansResults({
+				sortBy: createUrlSort($page.data.viewSettings.sort_by),
+				pageSize: $page.data.viewSettings.page_size,
+				filters: urlFilters,
+			})
+			.then(res => {
+				scans = res;
+				fetchInProgress = false;
+			}, onError);
+		}, onError)
+	}
+
+	function onPageIndexChanged(newIndex: number) {
+		fetchInProgress = true;
+		const onError = () => {
 			fetchInProgress = false;
-		}, onError);
+			toast.error('Failed to fetch scans results');
+		}
+		const pageSize = $page.data.viewSettings.page_size;
+		const offset = newIndex === 0 ? newIndex : (newIndex * pageSize) + 1;
+		getScansResults({
+				sortBy: createUrlSort($page.data.viewSettings.sort_by),
+				pageSize,
+				filters: createUrlFilters(filters),
+				offset,
+			})
+			.then(res => {
+				scans = res;
+				fetchInProgress = false;
+			}, onError);
 	}
 
 </script>
-<AppTable { columns } data={scans}
-	bind:this={table}
-	configuration={tableConfiguration} 
-	addData={() => setScanDialogOpenState(true)} 
-	bulkActions={onBulkActions}
-	rowClick={onRowClick}
-	pageSizeChanged={onPageSizeChanged}
-	sortingChanged={onSortingChanged}
-	filterChanged={onFilterChanged}/>
+{#key totalResults}
+	<AppTable { columns } data={scans}
+		bind:this={table}
+		configuration={tableConfiguration} 
+		addData={() => setScanDialogOpenState(true)} 
+		bulkActions={onBulkActions}
+		rowClick={onRowClick}
+		pageSizeChanged={onPageSizeChanged}
+		pageIndexChanged={onPageIndexChanged}
+		sortingChanged={onSortingChanged}
+		filterChanged={onFilterChanged}/>
+{/key}
 
 <Dialog.Root open={addScanDialogOpened} controlledOpen={true} onOpenChange={setScanDialogOpenState}>
   <Dialog.Content>
