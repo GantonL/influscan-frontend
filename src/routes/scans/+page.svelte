@@ -24,6 +24,7 @@
 	import type { SortingState } from "@tanstack/table-core";
 	import type { DateFilter } from "$lib/models/filter";
 	import { createUrlFilters, createUrlSort } from "$lib/utils";
+	import type { ScansViewSettings } from "$lib/models/view-settings";
 
   let scans = $state<OmittedScanResult[]>($page.data.scansResults ?? []);
 	let totalResults = $state($page.data.totalScansResults);
@@ -41,20 +42,21 @@
 	let limitReachedDialogOpened = $state(false);
 	let filters: DateFilter[] = $state($page.data.viewSettings.filters ?? []);
 	let fetchInProgress = $state(false);
+	let viewSettings = $state<ScansViewSettings>($page.data.viewSettings);
 
 	title.set('Scans');
 
 	$effect.pre(() => {
 		tableConfiguration.serverSide!.totalItems = totalResults;
-		const configuredPageSize = $page.data.viewSettings.page_size;
+		const configuredPageSize = viewSettings.page_size;
 		if (configuredPageSize) {
 			tableConfiguration.pageSize = configuredPageSize;
 		}
-		const configuredPageIndex = $page.data.viewSettings.page_index;
+		const configuredPageIndex = viewSettings.page_index;
 		if (configuredPageIndex) {
 			tableConfiguration.pageIndex = configuredPageIndex;
 		}
-		const configuredSortBy = $page.data.viewSettings.sort_by;
+		const configuredSortBy = viewSettings.sort_by;
 		if (configuredSortBy) {
 			tableConfiguration.sortingState = configuredSortBy;
 		}
@@ -248,7 +250,18 @@
 		fetch('/api/view/scans', {method: 'PUT', body})
 			.then((res) => {
 				res.json().catch(onError);
-			}, onError)
+			}, onError);
+		viewSettings.page_size = newPageSize;
+		fetchInProgress = true;
+		getScansResults({
+			sortBy: viewSettings.sort_by ? createUrlSort(viewSettings.sort_by) : undefined,
+			pageSize: viewSettings.page_size,
+			filters: createUrlFilters(filters),
+		})
+		.then(res => {
+			scans = res;
+			fetchInProgress = false;
+		}, onError);
 	}
 
 	function onSortingChanged(state: SortingState) {
@@ -260,7 +273,18 @@
 		fetch('/api/view/scans', {method: 'PUT', body})
 			.then((res) => {
 				res.json().catch(onError);
-			}, onError)
+			}, onError);
+		viewSettings.sort_by = state;
+		fetchInProgress = true;
+		getScansResults({
+			sortBy: createUrlSort(viewSettings.sort_by),
+			pageSize: viewSettings.page_size,
+			filters: createUrlFilters(filters),
+		})
+		.then(res => {
+			scans = res;
+			fetchInProgress = false;
+		}, onError);
 	}
 
 	function onFilterChanged(filter: DateFilter) {
@@ -311,8 +335,8 @@
 			totalResults = count;
 			tableConfiguration.serverSide!.totalItems = totalResults;
 			getScansResults({
-				sortBy: createUrlSort($page.data.viewSettings.sort_by),
-				pageSize: $page.data.viewSettings.page_size,
+				sortBy: viewSettings.sort_by ? createUrlSort(viewSettings.sort_by) : undefined,
+				pageSize: viewSettings.page_size,
 				filters: urlFilters,
 			})
 			.then(res => {
@@ -330,10 +354,10 @@
 			fetchInProgress = false;
 			toast.error('Failed to fetch scans results');
 		}
-		const pageSize = $page.data.viewSettings.page_size;
+		const pageSize = viewSettings.page_size ?? 10;
 		const offset = newIndex === 0 ? newIndex : (newIndex * pageSize) + 1;
 		getScansResults({
-				sortBy: createUrlSort($page.data.viewSettings.sort_by),
+				sortBy: viewSettings.sort_by ? createUrlSort(viewSettings.sort_by) : undefined,
 				pageSize,
 				filters: createUrlFilters(filters),
 				offset,
