@@ -18,6 +18,7 @@
 	import { pageSizeOptionsConfiguration } from "./defaults";
 	import DateRangePicker from "../date-range-picker/date-range-picker.svelte";
 	import { type DateFilter } from "$lib/models/filter";
+	import { type DateValue } from "@internationalized/date";
   
 
   type DataTableProps<TData, TValue> = {
@@ -56,6 +57,7 @@
   let rowSelection = $state<RowSelectionState>({});
   let sortingState = $state(configuration?.sortingState);
   let sorting = $state<SortingState>(sortingState ?? []);
+  let dateFilter = $state(configuration?.dateFilter?.initialState);
 
   const tableOptions: TableOptions<any> = ({
     get data() {
@@ -110,7 +112,7 @@
     },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    manualPagination: !!rowCount,
+    manualPagination: !!configuration?.serverSide?.manualPagination,
   })
   const table = createSvelteTable(tableOptions);
 
@@ -136,6 +138,28 @@
     const newPageSize = Number(e.data);
     pageSizeChanged && pageSizeChanged(newPageSize);
     table.setPageSize(newPageSize);
+  }
+
+  function onDateFilterChanged(date: DateValue, direction: 'start' | 'end') {
+    if (!filterChanged || !configuration?.dateFilter?.enabled) { return; }
+    const represntationalDate = `${date.year}-${date.month}-${date.day}`;
+    const dateFromValue = new Date(represntationalDate);
+    if (!dateFilter) {
+      dateFilter = {
+        start: dateFromValue,
+        end: dateFromValue,
+      }
+    } else {
+      if (direction === 'start' && dateFilter.start.getTime() === dateFromValue.getTime()) {
+        return;
+      }
+      if (direction === 'end' && dateFilter.end?.getTime() === dateFromValue.getTime()) {
+        return;
+      }
+
+    }
+    dateFilter[direction] = dateFromValue; 
+    filterChanged({type: 'date', path: configuration.dateFilter!.path, [direction]: represntationalDate})
   }
  </script>
   
@@ -210,10 +234,10 @@
         <DateRangePicker
           {disabled}
           useIsMobile={true}
-          start={configuration.dateFilter.initialState?.start}
-          end={configuration.dateFilter.initialState?.end}
-          startChanged={(v) => filterChanged && filterChanged({type: 'date', path: configuration.dateFilter!.path, start: `${v.year}-${v.month}-${v.day}`})}
-          endChanged={(v) => filterChanged && filterChanged({type: 'date', path: configuration.dateFilter!.path, end: `${v.year}-${v.month}-${v.day}`})}
+          start={dateFilter?.start}
+          end={dateFilter?.end}
+          startChanged={(v) => onDateFilterChanged(v, 'start')}
+          endChanged={(v) => onDateFilterChanged(v, 'end')}
           />
       {/if}
       <DropdownMenu.Root>

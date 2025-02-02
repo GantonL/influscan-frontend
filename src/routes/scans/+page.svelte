@@ -40,7 +40,7 @@
 	let scansMonthlyLimit = $state<number>(PlansConfiguration.get($page.data.user.plan)?.monthly_limit ?? 0);
 	let totalMonthlyScansCount = $state<number>($page.data.totalMonthlyScans);
 	let limitReachedDialogOpened = $state(false);
-	let filters: DateFilter[] = $state($page.data.viewSettings.filters ?? []);
+	let filters: DateFilter[] = $page.data.viewSettings.filters ?? [];
 	let fetchInProgress = $state(false);
 	let viewSettings = $state<ScansViewSettings>($page.data.viewSettings);
 
@@ -364,6 +364,9 @@
 			})
 			.then(res => {
 				scans = res;
+				if (scans.length === 0) {
+					tableConfiguration.serverSide!.totalItems = 0;
+				}
 				fetchInProgress = false;
 			}, onError);
 	}

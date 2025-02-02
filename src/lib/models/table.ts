@@ -15,5 +15,6 @@ export interface TableConfiguration<T> {
   serverSide?: {
     enabled: boolean;
     totalItems?: number;
+    manualPagination?: boolean;
   }
 }

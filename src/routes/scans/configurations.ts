@@ -124,6 +124,7 @@ export const tableConfiguration: TableConfiguration<TableScanResult> = {
   },
   serverSide: {
     enabled: true,
+    manualPagination: true,
   }
 };
 
