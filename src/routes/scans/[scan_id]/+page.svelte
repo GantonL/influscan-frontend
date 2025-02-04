@@ -77,7 +77,7 @@
 					<ExternalLink />
 					<h3>Sources</h3>
 				</div>
-				<div class="flex flex-row gap-2 flex-wrap">
+				<div class="flex flex-col gap-2 flex-wrap">
 					{#each scanResult.sources as source}
 						<a href={source}>{source}</a>
 					{/each}
