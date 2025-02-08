@@ -19,6 +19,7 @@
 	import DateRangePicker from "../date-range-picker/date-range-picker.svelte";
 	import { type DateFilter } from "$lib/models/filter";
 	import { type DateValue } from "@internationalized/date";
+	import { Input } from "../ui/input";
   
 
   type DataTableProps<TData, TValue> = {
@@ -273,9 +274,10 @@
   <div class="flex flex-row gap-2 justify-between">
     <div class="text-muted-foreground flex-1 text-sm">
       {table.getFilteredSelectedRowModel().rows.length} of{" "}
-      {table.getFilteredRowModel().rows.length} row(s) selected.
+      {table.getFilteredRowModel().rows.length} row(s) selected.<br>
+      <span>Total: {table.getRowCount()}</span> 
     </div>
-    <div class="flex items-center justify-end">
+    <div class="flex items-center justify-end gap-1">
       <Combobox
         {disabled}
         configuration={pageSizeOptionsConfiguration} 
@@ -289,6 +291,25 @@
       >
         <ChevronLeft />
       </Button>
+      <div class="flex flex-row gap-1 items-center">
+        <span>Page</span>
+        <Input type="number" class="max-w-14" 
+          value={table.getState().pagination.pageIndex + 1}
+          min=1
+          max={table.getPageCount()}
+          onchange={(v) => {
+              const val = v.target?.value;
+              const pageCount = table.getPageCount();
+              if (!val) return;
+              if (val < 1) {v.target.value = 1};
+              if (val > pageCount) {v.target.value = pageCount};
+              table.setPageIndex(Number(v.target.value) - 1)
+            }
+          }
+          disabled={(!table.getCanPreviousPage() && !table.getCanNextPage()) || disabled}>
+        </Input>
+        <span class="text-nowrap">of {table.getPageCount()}</span>
+      </div>
       <Button
         variant="outline"
         size="sm"
