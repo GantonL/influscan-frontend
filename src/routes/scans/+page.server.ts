@@ -13,7 +13,7 @@ import { parseUrlFilters, parseUrlSort } from '$lib/utils';
 
 const defaultPageFilter = () => {
   const now = new Date();
-  const calendar7DaysAgo = new CalendarDate(now.getFullYear(), now.getMonth(), now.getDate()).subtract({days: 7});
+  const calendar7DaysAgo = new CalendarDate(now.getFullYear(), (now.getMonth() + 1), now.getDate()).subtract({days: 7});
   return {column: 'created_at', operator: 'gte', value: `${calendar7DaysAgo.year}-${calendar7DaysAgo.month}-${calendar7DaysAgo.day}`};
 }
 

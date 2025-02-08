@@ -26,10 +26,10 @@
    dateStyle: "medium"
   });
   const now = new Date();
-  const calendarNow = new CalendarDate(now.getFullYear(), now.getMonth(), now.getDate());
+  const calendarNow = new CalendarDate(now.getFullYear(), (now.getMonth() + 1), now.getDate());
   let value: DateRange = $state({
-   start: start ? new CalendarDate(start.getFullYear(), start.getMonth(), start.getDate()) : calendarNow.subtract({days: 7}),
-   end: end ? new CalendarDate(end.getFullYear(), end.getMonth(), end.getDate()) : (start ? undefined : calendarNow),
+   start: start ? new CalendarDate(start.getFullYear(), start.getMonth() + 1, start.getDate()) : calendarNow.subtract({days: 7}),
+   end: end ? new CalendarDate(end.getFullYear(), end.getMonth() + 1, end.getDate()) : (start ? undefined : calendarNow),
   });
   
   let startValue: DateValue | undefined = $state(undefined);
@@ -45,7 +45,7 @@
      !value && "text-muted-foreground"
     )}
    >
-    <CalendarIcon class="mr-2 size-4" />
+    <CalendarIcon class="size-4" />
     {#if (useIsMobile && !sidebar.isMobile) || !useIsMobile}
       {#if value && value.start}
       {#if value.end}
