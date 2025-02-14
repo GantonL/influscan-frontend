@@ -20,6 +20,7 @@
 	import { type DateFilter } from "$lib/models/filter";
 	import { type DateValue } from "@internationalized/date";
 	import { Input } from "../ui/input";
+	import { useSidebar } from "../ui/sidebar";
   
 
   type DataTableProps<TData, TValue> = {
@@ -115,7 +116,10 @@
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: !!configuration?.serverSide?.manualPagination,
   })
+  
   const table = createSvelteTable(tableOptions);
+  
+  const sidebar = useSidebar();
 
   function onBulkMenu(e: {type: string; data: any}) {
     bulkActions && bulkActions(e);
@@ -141,25 +145,27 @@
     table.setPageSize(newPageSize);
   }
 
-  function onDateFilterChanged(date: DateValue, direction: 'start' | 'end') {
+  function onDateFilterChanged(date: DateValue | undefined, direction: 'start' | 'end') {
     if (!filterChanged || !configuration?.dateFilter?.enabled) { return; }
-    const represntationalDate = `${date.year}-${date.month}-${date.day}`;
-    const dateFromValue = new Date(represntationalDate);
-    if (!dateFilter) {
+    const represntationalDate = date ? `${date.year}-${date.month}-${date.day}` : undefined;
+    const dateFromValue = represntationalDate ? new Date(represntationalDate) : undefined;
+    if (!dateFilter && dateFromValue) {
       dateFilter = {
         start: dateFromValue,
         end: dateFromValue,
       }
     } else {
-      if (direction === 'start' && dateFilter.start.getTime() === dateFromValue.getTime()) {
+      if (direction === 'start' && dateFilter?.start?.getTime() === dateFromValue?.getTime()) {
         return;
       }
-      if (direction === 'end' && dateFilter.end?.getTime() === dateFromValue.getTime()) {
+      if (direction === 'end' && dateFilter?.end?.getTime() === dateFromValue?.getTime()) {
         return;
       }
 
     }
-    dateFilter[direction] = dateFromValue; 
+    if (dateFilter && dateFromValue) {
+      dateFilter[direction] = dateFromValue;
+    }
     filterChanged({type: 'date', path: configuration.dateFilter!.path, [direction]: represntationalDate})
   }
  </script>
@@ -220,7 +226,7 @@
       >
         <div class="flex flex-row gap-2 items-center">
           <Plus />
-          <span>Add</span>
+          <span class:hidden={sidebar.isMobile}>Add</span>
         </div>
       </Button>
       {#if configuration?.bulkActions && (table.getIsSomePageRowsSelected() || table.getIsAllPageRowsSelected() || table.getIsAllRowsSelected())}
@@ -246,7 +252,7 @@
           {#snippet child({ props })}
             <Button {...props} {disabled} variant="outline" class="flex flex-row gap-2 items-center">
               <Settings2 />
-              <span>View</span>
+              <span class:hidden={sidebar.isMobile}>View</span>
             </Button>
           {/snippet}
         </DropdownMenu.Trigger>
@@ -292,7 +298,7 @@
         <ChevronLeft />
       </Button>
       <div class="flex flex-row gap-1 items-center">
-        <span>Page</span>
+        <span class:hidden={sidebar.isMobile}>Page</span>
         <Input type="number" class="max-w-14" 
           value={table.getState().pagination.pageIndex + 1}
           min=1

@@ -65,8 +65,8 @@
 			if (tableConfiguration.dateFilter?.enabled) {
 				const dateFilter = configuredFilters.find((f: DateFilter) => f.type === 'date');
 				tableConfiguration.dateFilter.initialState = {
-					start: new Date(dateFilter.start),
-					end: new Date(dateFilter.end),
+					start: dateFilter.start && new Date(dateFilter.start),
+					end: dateFilter.end && new Date(dateFilter.end),
 				}
 			}
 		}
@@ -296,17 +296,17 @@
 					filters.push(dateFilter);
 				} else {
 					if (
-						((filter.start === dateFilter.start) && (filter.end === undefined)) ||
-						((filter.start === undefined) && (filter.end === dateFilter.end)) ||
+						((filter.start === dateFilter.start && filter.start !== undefined) && (filter.end === undefined)) ||
+						((filter.start === undefined) && (filter.end === dateFilter.end && filter.end !== undefined)) ||
 						((filter.start === dateFilter.start) && (filter.end === dateFilter.end))
 					) {
 						return;
 					}
 				}
-				if (filter.start) {
+				if (Object.hasOwn(filter, 'start')) {
 					dateFilter.start = filter.start;
 				}
-				if (filter.end) {
+				if (Object.hasOwn(filter, 'end')) {
 					dateFilter.end = filter.end;
 				}
 				const body = new FormData();

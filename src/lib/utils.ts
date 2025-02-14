@@ -23,8 +23,8 @@ export function parseUrlFilters(filters: string | string[]): DateFilter[] | unde
 				results.push({
 					type: 'date',
 					path: parsedFilter[1],
-					start: parsedFilter[2],
-					end: parsedFilter[3],
+					start: parsedFilter[2] === 'undefined' ? undefined : parsedFilter[2],
+					end: parsedFilter[3] === 'undefined' ? undefined : parsedFilter[3],
 				})
 				break;
 			default:
@@ -42,6 +42,9 @@ export function createUrlFilters(filters: DateFilter[]): string {
 		}
 		switch (filter.type) {
 			case 'date':
+				if (filter.start === undefined && filter.end === undefined) {
+					break;
+				}
 				result = result.concat(`${filter.type}|${filter.path}|${filter.start}|${filter.end ?? ''}`);
 				break;
 			default:

@@ -17,7 +17,9 @@ export const getScans = async (user_id: string, options?: {
     .eq('user_id', user_id)
   if (options?.filters) {
     options.filters.forEach((filter) => {
-      query.filter(filter.column, filter.operator, filter.value);
+      if (filter.value !== undefined) {
+        query.filter(filter.column, filter.operator, filter.value);
+      }
     })
   }
   if (options?.sortBy) {
