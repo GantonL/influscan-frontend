@@ -36,10 +36,10 @@
   });
   const now = new Date();
   const calendarNow = new CalendarDate(now.getFullYear(), (now.getMonth() + 1), now.getDate());
-  let value: DateRange | undefined = $state({
+  let value: DateRange | undefined = $state((start || end) ? {
    start: start ? new CalendarDate(start.getFullYear(), start.getMonth() + 1, start.getDate()) : undefined,
    end: end ? new CalendarDate(end.getFullYear(), end.getMonth() + 1, end.getDate()) : undefined,
-  });
+  } : undefined);
   let startValue: DateValue | undefined = $state(undefined);
   const sidebar = useSidebar();
   if (!presets) {
@@ -82,7 +82,7 @@
       } 
     })
   }
-  const selectedPreset = $state(presets!.find(p => p.range.start?.toString() === value.start?.toString() && p.range.end?.toString() === value.end?.toString()));
+  const selectedPreset = $state(presets!.find(p => p.range.start?.toString() === value?.start?.toString() && p.range.end?.toString() === value?.end?.toString()));
   
   function onPresetsChanged(newPreset: Preset['label']) {
     const selectedPreset = presets?.find(p => p.label === newPreset);
@@ -96,7 +96,10 @@
   }
 
   function reset() {
-    value = undefined;
+    if (value) {
+      value.start = undefined;
+      value.end = undefined;
+    }
     startChanged && startChanged(undefined);
     endChanged && endChanged(undefined);
   }
