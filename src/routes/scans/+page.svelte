@@ -375,6 +375,7 @@
 {#key totalResults}
 	<AppTable { columns } data={scans}
 		disabled={fetchInProgress}
+		isLoading={fetchInProgress}
 		bind:this={table}
 		configuration={tableConfiguration} 
 		addData={() => setScanDialogOpenState(true)} 

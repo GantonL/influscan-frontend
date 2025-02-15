@@ -21,6 +21,7 @@
 	import { type DateValue } from "@internationalized/date";
 	import { Input } from "../ui/input";
 	import { useSidebar } from "../ui/sidebar";
+	import { Skeleton } from "../ui/skeleton";
   
 
   type DataTableProps<TData, TValue> = {
@@ -28,13 +29,15 @@
     data: TData[];
     configuration?: TableConfiguration<TData>;
     disabled?: boolean;
+    isLoading?: boolean;
   };
   
   let { 
     data, 
     columns,
     disabled,
-    configuration, 
+    configuration,
+    isLoading,
     addData, 
     bulkActions, 
     rowClick,
@@ -203,12 +206,22 @@
          </Table.Cell>
         {/each}
        </Table.Row>
-      {:else}
-       <Table.Row>
-        <Table.Cell colspan={columns.length} class="h-24 text-center">
-          <EmptyResults />
-        </Table.Cell>
-       </Table.Row>
+      {:else }
+        {#if isLoading}
+        <Table.Row>
+          <Table.Cell colspan={columns.length}>
+            <Skeleton class="mb-2 h-12 rounded-md" />
+            <Skeleton class="mb-2 h-12 rounded-md" />
+            <Skeleton class="mb-2 h-12 rounded-md" />
+          </Table.Cell>
+        </Table.Row>
+        {:else}
+          <Table.Row>
+            <Table.Cell colspan={columns.length} class="h-24 text-center">
+              <EmptyResults />
+            </Table.Cell>
+          </Table.Row>
+        {/if}
       {/each}
      </Table.Body>
     </Table.Root>
