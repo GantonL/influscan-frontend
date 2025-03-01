@@ -8,6 +8,8 @@
 	import { page } from "$app/stores";
 	import { Plan } from "$lib/enums/plan";
 	import { LogIn, Zap } from "lucide-svelte";
+	import Features from "./features.svelte";
+	import Separator from "$lib/components/ui/separator/separator.svelte";
   title.clear();
   const user: User | undefined = $state<User | undefined>($page.data.user); 
 </script>
@@ -25,6 +27,9 @@
     </div>
   </div>
 </div>
+<Separator />
+<Features />
 {#if (!user?.plan || user?.plan === Plan.None )}
+<Separator />
 <Plans />
 {/if}
