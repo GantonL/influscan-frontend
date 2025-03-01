@@ -10,7 +10,7 @@ import Checkbox from "$lib/components/checkbox/checkbox.svelte";
 import ScanResultExplanation from "$lib/components/scan-result-explanaiton/scan-result-explanation.svelte";
 import type { TableConfiguration } from "$lib/models/table";
 
-type TableScanResult = Pick<ScanResult, 'details' | 'id' | 'estimation' | 'explanation' | 'status' | 'rankings'>;
+export type TableScanResult = Pick<ScanResult, 'details' | 'id' | 'estimation' | 'explanation' | 'status' | 'rankings'>;
 
 export const columns: ColumnDef<TableScanResult>[] = [
   {

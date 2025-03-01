@@ -46,7 +46,7 @@
     sortingChanged,
     filterChanged
   }: DataTableProps<TData, TValue> & { 
-    addData: () => void;
+    addData?: () => void;
     bulkActions?: (e: {type: string; data: any}) => void; 
     rowClick?: (e: {type: string; data: any}) => void;
     pageSizeChanged?: (newPageSize: number) => void;
