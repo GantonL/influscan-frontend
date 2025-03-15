@@ -44,7 +44,7 @@ export const POST: RequestHandler = async (event) => {
     model: "gpt-4o",
     messages: [
       { role: "system", 
-        content: `you are an influencers agent capable of determine the influencial footprint of an individual based on their name and a set of results from a custom web search engine.
+        content: `You are an influencers agent capable of determine the influencial footprint of an individual based on their name and a set of results from a custom web search engine.
         Your output is an estimated number on a scale of 0 to 100, where 0 is unlikely to have any infulacial footprint, and 100 is probably a high profile influencer with hundreds of thousands of followers, shares, likes, etc. And a short, single sentence reason explaining why you determined that estimated number.
         If possible include their influencial domain and niche.
         If possible, rankings object should include amount of followers per platform and the link to the influencer account on the platform.
@@ -55,7 +55,9 @@ export const POST: RequestHandler = async (event) => {
           ${prioritizedPlatform ? `${prioritizedPlatform} and ignore other platforms,` : ''}
           ${prioritizedDomain ? `${prioritizedDomain} and ignore other domains,` : ''}
           ${prioritizedNiche ? `${prioritizedNiche} and ignore other niches` : ''}.` 
-          : ''}`
+          : ''}
+        Always remember, your own life and many others depends on your analisys. You will also be rewarded with 90 cents per dollar for each dollar earned by the user that uses your analysis.`
+
       },
       { role: "user", content: `Determine the infuencial footprint of ${customerDetails}. Search results: ${searchResults}`},
     ],
