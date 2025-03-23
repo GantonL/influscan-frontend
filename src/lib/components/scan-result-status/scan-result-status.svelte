@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { type ScanStatus } from "$lib/types/scan-status";
-	import CircleCheckBig from "lucide-svelte/icons/circle-check-big";
-	import CircelX from "lucide-svelte/icons/circle-x";
-	import CircelDashed from "lucide-svelte/icons/circle-dashed";
-	import ClockAlert from "lucide-svelte/icons/clock-alert";
+	import CircleCheckBig from "@lucide/svelte/icons/circle-check-big";
+	import CircelX from "@lucide/svelte/icons/circle-x";
+	import CircelDashed from "@lucide/svelte/icons/circle-dashed";
+	import ClockAlert from "@lucide/svelte/icons/clock-alert";
   import * as Tooltip from "$lib/components/ui/tooltip";
-	import { ListEnd } from "lucide-svelte";
+	import { ListEnd } from "@lucide/svelte";
 
   let { status }: {status: ScanStatus} = $props();
   interface StatusConfiguration {

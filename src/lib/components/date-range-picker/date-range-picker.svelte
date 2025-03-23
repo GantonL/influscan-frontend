@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CalendarIcon from "lucide-svelte/icons/calendar";
+  import CalendarIcon from "@lucide/svelte/icons/calendar";
   import type { DateRange } from "bits-ui";
   import {
    CalendarDate,
@@ -15,7 +15,7 @@
 	import Combobox from "../combobox/combobox.svelte";
 	import type { ComboboxConfiguration } from "$lib/models/combobox";
 	import Button from "../ui/button/button.svelte";
-	import { FilterX } from "lucide-svelte";
+	import { FilterX } from "@lucide/svelte";
   type Preset = {
     label: string;
     range: DateRange;

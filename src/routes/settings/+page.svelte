@@ -4,7 +4,7 @@
 	import * as Card from "$lib/components/ui/card";
 	import type { ScansSettings, SettingsChoisesAction, SettingsItemConfiguration, SettingsTextAction } from "$lib/models/settings";
 	import { title } from "$lib/stores";
-	import { LoaderCircle } from "lucide-svelte";
+	import { LoaderCircle } from "@lucide/svelte";
 	import { ScansSettingsConfigurations } from "./configurations";
 	import { updateScansSettings } from "./utilities";
 	import Combobox from "$lib/components/combobox/combobox.svelte";

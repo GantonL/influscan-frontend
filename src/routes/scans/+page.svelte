@@ -8,7 +8,7 @@
 	import { Button } from "$lib/components/ui/button";
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { Label } from "$lib/components/ui/label";
-	import { HelpCircle, LoaderCircle } from "lucide-svelte";
+	import { HelpCircle, LoaderCircle } from "@lucide/svelte";
 	import { buildScanResultObjectFromParsedRawData, createScanObject, deleteScanObject, getScansResults, getScansResultsCount, type OmittedScanResult } from "./utilities";
 	import * as Form from "$lib/components/ui/form";
 	import { superForm } from "sveltekit-superforms";

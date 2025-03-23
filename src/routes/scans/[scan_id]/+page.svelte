@@ -4,7 +4,7 @@
 	import * as Card from "$lib/components/ui/card";
 	import type { ScanResult } from "$lib/models/scan";
 	import { title } from "$lib/stores";
-	import { ChartNoAxesColumnIncreasing, ExternalLink, Image, LandPlot, Puzzle, Star } from "lucide-svelte";
+	import { ChartNoAxesColumnIncreasing, ExternalLink, Image, LandPlot, Puzzle, Star } from "@lucide/svelte";
 	import { actionsMenuConfiguration } from "./configurations";
 	import ScanResultRankings from "$lib/components/scan-result-rankings/scan-result-rankings.svelte";
 	import Gauge from "$lib/components/gauge/gauge.svelte";

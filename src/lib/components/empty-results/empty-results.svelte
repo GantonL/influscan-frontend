@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CircleOff from "lucide-svelte/icons/circle-off";
+  import CircleOff from "@lucide/svelte/icons/circle-off";
   import { Button } from "$lib/components/ui/button";
   import { type EmptyResultsConfiguration } from "$lib/models/common";
 

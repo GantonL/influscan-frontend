@@ -7,7 +7,7 @@
 	import type { User } from "$lib/models/user";
 	import { page } from "$app/stores";
 	import { Plan } from "$lib/enums/plan";
-	import { LogIn, Zap } from "lucide-svelte";
+	import { LogIn, Zap } from "@lucide/svelte";
 	import Features from "./features.svelte";
 	import Separator from "$lib/components/ui/separator/separator.svelte";
   title.clear();

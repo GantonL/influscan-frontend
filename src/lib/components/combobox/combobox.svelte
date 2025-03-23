@@ -1,13 +1,13 @@
 <script lang="ts">
-  import Check from "lucide-svelte/icons/check";
-  import ChevronsUpDown from "lucide-svelte/icons/chevrons-up-down";
+  import Check from "@lucide/svelte/icons/check";
+  import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import { tick } from "svelte";
   import * as Command from "$lib/components/ui/command/index.js";
   import * as Popover from "$lib/components/ui/popover/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import { cn } from "$lib/utils.js";
 	import type { ComboboxConfiguration } from "$lib/models/combobox";
-	import { LoaderCircle } from "lucide-svelte";
+	import { LoaderCircle } from "@lucide/svelte";
   
   let {configuration, selectedOption, event, disabled, inProgress}: {
     configuration: ComboboxConfiguration; 

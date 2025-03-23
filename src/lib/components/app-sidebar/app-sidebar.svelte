@@ -1,15 +1,15 @@
 <script lang="ts">
-  import Settings from "lucide-svelte/icons/settings";
+  import Settings from "@lucide/svelte/icons/settings";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-	import Radar from "lucide-svelte/icons/radar";
-	import CircleHelp from "lucide-svelte/icons/circle-help";
-	import Send from "lucide-svelte/icons/send";
+	import Radar from "@lucide/svelte/icons/radar";
+	import CircleHelp from "@lucide/svelte/icons/circle-help";
+	import Send from "@lucide/svelte/icons/send";
 	import { page } from "$app/stores";
 	import { onMount } from "svelte";
 	import { Plan } from "$lib/enums/plan";
 	import { Button } from "../ui/button";
 	import { PlansDisplayConfiguartion } from "$lib/configurations/plans";
-	import { Workflow } from "lucide-svelte";
+	import { Workflow } from "@lucide/svelte";
   
   let { plan }: {plan?: Plan} = $props();
 

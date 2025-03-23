@@ -1,7 +1,7 @@
 import { Plan, PlanFeatures } from "$lib/enums/plan";
 import type { MenuActionItem } from "$lib/models/menu";
 import type { PlanConfiguration, PlanDisplayConfigration } from "$lib/models/plan";
-import { ArrowDownFromLine, ArrowUpFromLine, CircleOff, CircleSlash2, Heart, Spade, Sparkle } from "lucide-svelte";
+import { ArrowDownFromLine, ArrowUpFromLine, CircleOff, CircleSlash2, Heart, Spade, Sparkle } from "@lucide/svelte";
 
 export const PlansConfiguration = new Map<Plan, PlanConfiguration>([
   [Plan.None, { monthly_limit: 0, price: 0 }],

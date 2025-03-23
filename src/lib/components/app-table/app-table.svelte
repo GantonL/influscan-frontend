@@ -7,10 +7,10 @@
   import * as Table from "$lib/components/ui/table/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
-	import Settings2 from "lucide-svelte/icons/settings-2";
-	import ChevronLeft from "lucide-svelte/icons/chevron-left";
-	import ChevronRight from "lucide-svelte/icons/chevron-right";
-	import { Plus } from "lucide-svelte";
+	import Settings2 from "@lucide/svelte/icons/settings-2";
+	import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+	import ChevronRight from "@lucide/svelte/icons/chevron-right";
+	import { Plus } from "@lucide/svelte";
 	import EmptyResults from "../empty-results/empty-results.svelte";
 	import { type TableConfiguration } from "$lib/models/table";
 	import Menu from "../menu/menu.svelte";

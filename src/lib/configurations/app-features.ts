@@ -1,7 +1,7 @@
 
 import { PlansDisplayConfiguartion } from "$lib/configurations/plans";
 import { Plan } from "$lib/enums/plan";
-import { Code, Radar, Workflow } from "lucide-svelte";
+import { Code, Radar, Workflow } from "@lucide/svelte";
 
 export const AppFeatures = [
   {

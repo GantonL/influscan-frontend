@@ -5,7 +5,7 @@
 	import * as Card from "$lib/components/ui/card";
 	import type { User } from "$lib/models/user";
 	import { Plan } from "$lib/enums/plan";
-	import { Check, LoaderCircle, X } from "lucide-svelte";
+	import { Check, LoaderCircle, X } from "@lucide/svelte";
 	import { PlansDisplayConfiguartion } from "$lib/configurations/plans";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
