@@ -9,7 +9,7 @@
 	import { Plan } from "$lib/enums/plan";
 	import { Button } from "../ui/button";
 	import { PlansDisplayConfiguartion } from "$lib/configurations/plans";
-	import { Workflow } from "@lucide/svelte";
+	import { ChartColumn, Workflow } from "@lucide/svelte";
   
   let { plan }: {plan?: Plan} = $props();
 
@@ -21,6 +21,11 @@
           title: "Scans",
           url: "/scans",
           icon: Radar,
+        },
+        {
+          title: "Stats",
+          url: "/stats",
+          icon: ChartColumn,
         },
         {
           title: "Integrations",
