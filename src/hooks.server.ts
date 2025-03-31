@@ -11,6 +11,7 @@ export const handle: Handle = sequence(
 			'/api',
 			'/settings',
 			'/plan',
+			'/integrations',
 		],
 		signInUrl: '/sign-in',
 		authorizedParties: ['http://localhost:5173', 'https://influscan.pages.dev'],
