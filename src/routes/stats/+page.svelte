@@ -17,7 +17,7 @@
     </Card.Header>
     <Card.Content>
       <div class="text-2xl font-bold">{totalMonthlyScans}<span class="text-muted-foreground text-lg">/{PlansConfiguration.get(user.plan)!.monthly_limit}</span></div>
-      <p class="text-muted-foreground text-sm"> Go to plan to upgrade your plan</p>
+      <a href="/plan" class="text-muted-foreground text-sm">Change plan</a>
     </Card.Content>
   </Card.Root>
 </div>
