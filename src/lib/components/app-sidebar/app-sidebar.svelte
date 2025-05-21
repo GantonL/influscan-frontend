@@ -5,11 +5,11 @@
 	import CircleHelp from "@lucide/svelte/icons/circle-help";
 	import Send from "@lucide/svelte/icons/send";
 	import { page } from "$app/stores";
-	import { onMount } from "svelte";
 	import { Plan } from "$lib/enums/plan";
 	import { Button } from "../ui/button";
 	import { PlansDisplayConfiguartion } from "$lib/configurations/plans";
 	import { ChartColumn, Workflow } from "@lucide/svelte";
+	import { useSidebar } from "$lib/components/ui/sidebar";
   
   let { plan }: {plan?: Plan} = $props();
 
@@ -59,11 +59,7 @@
     }
   ];
   let currentPath = $derived($page.url.pathname);
-
-  let sidebar: { isMobile: boolean, toggle: () => void };
-  onMount(() => {
-    sidebar = Sidebar.useSidebar();
-  });
+  const sidebar = useSidebar();
 
   function onSidebarLink() {
     if (!sidebar.isMobile) { return; }
@@ -107,7 +103,9 @@
             <a href="/plan">
               <Button variant="outline" {...props} class={'w-full ' + planConfig.class}>
                 <planConfig.icon size=20 class={planConfig.iconClass} />
-                <span>{planConfig.name} plan</span>
+                {#if sidebar.open}
+                  <span>{planConfig.name} plan</span>
+                {/if}
               </Button>
             </a>
           {/snippet}
