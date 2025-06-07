@@ -6,9 +6,8 @@
 	import { LogIn, Zap, Play, Users, TrendingUp, Radar } from '@lucide/svelte';
 
 	const stats = [
-		{ value: '10K+', label: 'Scans Completed' },
-		{ value: '500+', label: 'Businesses Served' },
-		{ value: '50K+', label: 'Influencers Discovered' }
+		{ value: '50K+', label: 'Scans Completed' },
+		{ value: '10K+', label: 'Influencers Discovered' }
 	];
 </script>
 
@@ -58,7 +57,7 @@
 		</div>
 
 		<!-- Stats -->
-		<div class="grid grid-cols-3 gap-6 pt-8 border-t">
+		<div class="grid grid-cols-2 gap-6 pt-8 border-t">
 			{#each stats as stat}
 				<div class="text-center">
 					<div class="text-2xl lg:text-3xl font-bold text-primary">{stat.value}</div>
