@@ -6,7 +6,7 @@
 	import SignedIn from 'clerk-sveltekit/client/SignedIn.svelte'
 	import SignedOut from 'clerk-sveltekit/client/SignedOut.svelte'
 	import Button from "../ui/button/button.svelte";
-	import { Radar } from "@lucide/svelte";
+	import InfluscanLogo from "../icons/influscan-logo.svelte";
 </script>
 <header class="grid grid-cols-2 w-full p-2 border-b">
   <div class="flex flex-row items-center gap-4">
@@ -14,7 +14,7 @@
       <SidebarTrigger />
     </SignedIn>
     <h1 class="flex flex-row items-center gap-3 text-xl">
-      <Radar />
+      <InfluscanLogo size={28} />
       <a href="/">InfluScan</a>
       <Badge variant="secondary">Preview</Badge>
     </h1>
